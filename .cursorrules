@@ -1,0 +1,72 @@
+# Snake Game Project Rules
+
+## Project Overview
+- Language: C (C11 standard)
+- Graphics: raylib
+- Build: Make (MinGW-w64)
+- Platform: Windows
+
+## Architecture (MVC Pattern)
+- Model Layer: snake.c, food.c (NO raylib)
+- Logic Layer: game.c (NO raylib)
+- View Layer: renderer.c (raylib OK)
+- Controller: main.c (raylib input OK)
+
+## Naming Conventions
+- Functions: snake_case (e.g., snake_move, game_update)
+- Types/Structs: PascalCase (e.g., Snake, GameState)
+- Constants: UPPER_SNAKE_CASE (e.g., GRID_WIDTH)
+- Global vars: g_ prefix (e.g., g_game_state)
+- Static vars: s_ prefix (e.g., s_frame_count)
+- Pointers: p_ prefix (e.g., p_snake)
+
+## Code Style
+- 4 spaces indentation (no tabs)
+- Opening brace on same line
+- Max function length: 50 lines
+- Max parameters: 4
+- Always use braces for if/for/while
+
+## Required Practices
+- NULL pointer check at function start
+- Free all malloc'd memory
+- Use constants instead of magic numbers
+- Doxygen comments for public functions
+
+## Prohibited
+- raylib in Model/Logic layers
+- Global variable abuse
+- goto statements
+- Magic numbers
+- Circular dependencies
+
+## File Structure
+- Headers: include/*.h
+- Sources: src/*.c
+- Tests: test/test_*.c
+
+## Error Handling Pattern
+```c
+bool function_name(Type* p_param) {
+    if (p_param == NULL) {
+        fprintf(stderr, "Error: NULL pointer\n");
+        return false;
+    }
+    // ... logic ...
+    return true;
+}
+```
+
+## Comment Style (Doxygen)
+```c
+/**
+ * Brief description.
+ * @param p_param Parameter description
+ * @return Return value description
+ */
+```
+
+## Build Commands
+- make: Build project
+- make clean: Clean build
+- make test: Run tests
