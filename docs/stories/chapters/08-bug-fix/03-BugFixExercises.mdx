@@ -36,7 +36,10 @@ flowchart LR
 ![](018-bug-01.png)
 
 이 파일을 복사해서 실습을 진행합시다. 주의할 사항은 주석은 모두 제거해야 합니다.
+
 agent에게 정답지를 알려주면 안되니깐요
+
+![](018-bug-02.png)
 
 ---
 
@@ -72,13 +75,12 @@ bool snake_init(Snake* p_snake, int start_x, int start_y) {
 <Source
   language="text"
   code={`
-> exercises/buggy_snake.c의 snake_init 함수에
-> NULL 포인터가 전달되면 크래시가 발생해.
-> NULL 체크를 추가해서 수정해줘.
+exercises/buggy_snake.c의 snake_init 함수에
+NULL 포인터가 전달되면 크래시가 발생해.
+NULL 체크를 추가해서 수정해줘.
 `}
 />
 
-<Placeholder type="video" alt="Agent가 NULL 체크를 추가하는 과정" />
 
 ---
 
@@ -150,7 +152,7 @@ void snake_set_direction(Snake* p_snake, Direction new_dir) {
 `}
 />
 
-<Placeholder type="image" alt="수정 전후 코드 비교 - 방향 체크 조건 추가" />
+
 
 ---
 
@@ -179,7 +181,7 @@ void snake_set_direction(Snake* p_snake, Direction new_dir) {
 `}
 />
 
-<Placeholder type="video" alt="Agent가 파일 전체를 분석하고 여러 버그를 순차적으로 수정하는 과정" />
+
 
 ---
 
@@ -201,7 +203,7 @@ make test
 `}
 />
 
-<Placeholder type="image" alt="빌드 성공 및 테스트 통과 메시지" />
+
 
 ---
 
