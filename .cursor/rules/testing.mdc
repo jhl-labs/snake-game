@@ -1,0 +1,58 @@
+---
+alwaysApply: false
+description: 테스트 코드 작성 규칙을 정의합니다. 테스트 네이밍, 구조, 커버리지 요구사항을 포함합니다.
+globs: ["test_*.c", "*_test.c"]
+---
+
+# 테스트 규칙
+
+## 테스트 파일 네이밍
+- 패턴: `test_<module>.c` 또는 `<module>_test.c`
+- 예시: `test_snake.c`, `game_test.c`
+
+## 테스트 함수 네이밍
+- 패턴: `test_<function>_<scenario>()`
+- 예시:
+  - `test_snake_move_up()` - 위쪽 이동 테스트
+  - `test_snake_collision_wall()` - 벽 충돌 테스트
+  - `test_food_spawn_valid_position()` - 유효 위치 생성 테스트
+
+## 테스트 구조 (AAA Pattern)
+
+```c
+void test_snake_move_up(void) {
+    // Arrange - 준비
+    Snake snake;
+    snake_init(&snake, 5, 5);
+
+    // Act - 실행
+    snake_move(&snake, DIRECTION_UP);
+
+    // Assert - 검증
+    assert(snake.head_y == 4);
+    assert(snake.head_x == 5);  // x는 변경되지 않음
+}
+```
+
+## 테스트 커버리지 요구사항
+
+### 필수 테스트
+- 모든 공개(public) 함수는 최소 하나의 테스트 필요
+- 경계 조건(boundary) 테스트 필수
+- 에러 케이스 테스트 필수
+
+### 경계 조건 예시
+- 배열: 0, MAX-1, MAX
+- 좌표: (0,0), (MAX_X-1, MAX_Y-1)
+- 상태: 빈 상태, 가득 찬 상태
+
+### 에러 케이스 예시
+- NULL 포인터 입력
+- 잘못된 방향 값
+- 범위 초과 좌표
+
+## 테스트 실행
+
+```bash
+make test
+```

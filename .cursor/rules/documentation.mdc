@@ -1,0 +1,62 @@
+---
+alwaysApply: true
+description: 코드 문서화 규칙을 정의합니다. Doxygen 스타일 주석, 파일 헤더, 인라인 주석 작성법을 포함합니다.
+---
+
+# 문서화 규칙
+
+## 함수 주석 (Doxygen 스타일)
+
+모든 공개 함수에 필수:
+
+```c
+/**
+ * 뱀을 지정된 방향으로 이동시킵니다.
+ *
+ * @param p_snake 뱀 객체 포인터 (NULL 불가)
+ * @param direction 이동 방향 (DIRECTION_UP/DOWN/LEFT/RIGHT)
+ * @return true: 이동 성공, false: 이동 실패 (충돌 등)
+ *
+ * @note 이동 전 충돌 검사를 수행합니다.
+ * @warning p_snake가 NULL이면 false를 반환합니다.
+ */
+bool snake_move(Snake* p_snake, Direction direction);
+```
+
+## 파일 헤더
+
+각 소스/헤더 파일 시작 부분에:
+
+```c
+/**
+ * @file snake.c
+ * @brief 뱀 모델 구현
+ *
+ * 뱀의 데이터 구조와 이동, 성장 등의 동작을 관리합니다.
+ * raylib에 의존하지 않는 순수 모델 레이어입니다.
+ */
+```
+
+## 인라인 주석
+
+### 사용해야 할 때
+- 복잡한 알고리즘 설명
+- 비직관적인 로직 설명
+- 중요한 결정 사항
+
+### 사용하지 말아야 할 때
+```c
+// BAD - 코드가 이미 명확함
+i++;  // i를 1 증가
+
+// GOOD - WHY를 설명
+i++;  // 헤더 행 건너뛰기
+```
+
+## TODO 주석
+
+```c
+// TODO: 벽 통과 모드 구현
+// TODO(username): 메모리 누수 수정 필요
+// FIXME: 경계 조건에서 크래시 발생
+```
