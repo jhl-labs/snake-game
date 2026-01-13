@@ -21,6 +21,7 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -53,4 +54,3 @@ jobs:
             - 모듈 간 의존성
 
             한국어로 리뷰해주세요.
-          timeout_minutes: 10
