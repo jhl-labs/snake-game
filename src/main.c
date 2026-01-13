@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "renderer.h"
+#include "intro.h"
 #include "game_constants.h"
 
 // raylib 입력 헤더
@@ -67,17 +68,27 @@ int main(void) {
 
     // 게임 루프
     while (!renderer_window_should_close()) {
-        // 입력 처리
-        process_input(&game);
+        GameState state = game_get_state(&game);
 
-        // 게임 업데이트
-        game_update(&game);
+        // 인트로 화면에서 게임 시작 확인
+        if (state == GAME_STATE_MENU) {
+            if (intro_should_start_game()) {
+                game_restart(&game);  // 게임 시작
+            }
+        } else {
+            // 입력 처리
+            process_input(&game);
+
+            // 게임 업데이트
+            game_update(&game);
+        }
 
         // 렌더링
         renderer_begin();
 
-        GameState state = game_get_state(&game);
-        if (state == GAME_STATE_GAME_OVER) {
+        if (state == GAME_STATE_MENU) {
+            intro_render();
+        } else if (state == GAME_STATE_GAME_OVER) {
             renderer_draw_game_over(&game);
         } else {
             renderer_draw_game(&game);
