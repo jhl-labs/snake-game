@@ -11,27 +11,7 @@ Agent에게 버그를 효과적으로 설명하면 더 정확한 수정을 받�
 
 ---
 
-## 버그 리포트 구조
 
-<Mermaid chart={`
-flowchart TB
-    subgraph Report["버그 리포트"]
-        Symptom["🔴 증상<br/>무엇이 잘못되었는지"]
-        Repro["📋 재현 방법<br/>단계별 설명"]
-        Expected["✅ 예상 동작<br/>정상적인 동작"]
-        Actual["❌ 실제 동작<br/>현재 발생하는 문제"]
-        Files["📁 관련 파일<br/>코드 위치"]
-        Error["⚠️ 에러 메시지<br/>로그, 스택트레이스"]
-    end
-
-    Symptom --> Repro
-    Repro --> Expected
-    Expected --> Actual
-    Actual --> Files
-    Files --> Error
-`} />
-
----
 
 ## 버그 리포트 템플릿
 
@@ -65,7 +45,6 @@ flowchart TB
 `}
 />
 
-<Placeholder type="image" alt="버그 리포트 템플릿이 작성된 모습" />
 
 ---
 
@@ -143,7 +122,6 @@ Segmentation fault at snake.c:45
 `}
 />
 
-<Placeholder type="video" alt="Agent가 버그 리포트를 분석하고 해당 코드를 찾아가는 과정" />
 
 ---
 

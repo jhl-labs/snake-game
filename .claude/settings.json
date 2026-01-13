@@ -18,17 +18,7 @@
     "CFLAGS": "-Wall -Wextra"
   },
   "hooks": {
-    "PreToolUse": {
-      "Bash": {
-        "command": "echo 'Executing command...'",
-        "enabled": false
-      }
-    },
-    "PostToolUse": {
-      "Edit": {
-        "command": "echo 'File modified'",
-        "enabled": false
-      }
-    }
+    "PreToolUse": [],
+    "PostToolUse": []
   }
 }

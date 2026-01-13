@@ -5,7 +5,7 @@ import { Mermaid } from '../../../components/Mermaid';
 
 <Meta title="Chapters/06. Subagent와 Agent Skills/6.1 Subagent 개념" />
 
-# Chapter 6: Subagent와 Agent Skills
+# Chapter 6: Subagent와 Agent Skills (claude-code 전용)
 
 **예상 소요 시간: 30분**
 
@@ -15,6 +15,8 @@ import { Mermaid } from '../../../components/Mermaid';
 
 Subagent는 **특정 작업에 특화된 보조 Agent**입니다.
 메인 Agent가 복잡한 작업을 분업하여 처리할 때 사용됩니다.
+
+![](016-subagent-01.png)
 
 ---
 
@@ -53,6 +55,10 @@ flowchart TB
 | 복잡한 작업 | 중간에 실패 가능 | 단계별 안정 실행 |
 | 병렬 작업 | 불가능 | 동시 실행 가능 |
 
+![](016-subagent-02.png)
+
+![](016-subagent-03.png)
+
 ---
 
 ## Claude Code의 Subagent 유형
@@ -85,7 +91,7 @@ sequenceDiagram
     Main-->>User: "버그를 수정했습니다"
 `} />
 
-<Placeholder type="video" alt="복잡한 요청이 여러 Subagent로 분배되어 처리되는 과정" />
+![](016-subagent-04.png)
 
 ---
 
@@ -155,7 +161,7 @@ claude
 `}
 />
 
-<Placeholder type="image" alt="Explore subagent가 메모리 관련 코드를 탐색하는 결과" />
+
 
 ### 관찰 포인트
 

@@ -16,9 +16,9 @@ Cursor는 세 가지 방식으로 AI와 상호작용합니다:
 <Mermaid chart={`
 flowchart LR
     subgraph Cursor["Cursor AI 기능"]
-        Agent["🤖 Agent<br/>Cmd+I"]
+        Agent["🤖 Agent<br/>Ctrl+I"]
         Tab["⌨️ Tab<br/>자동완성"]
-        Inline["✏️ Inline Edit<br/>Cmd+K"]
+        Inline["✏️ Inline Edit<br/>Ctrl+K"]
     end
 
     Agent -->|"자율적 작업"| A["멀티파일 편집, 빌드, 테스트"]
@@ -28,19 +28,21 @@ flowchart LR
 
 | 기능 | 단축키 | 용도 |
 |------|--------|------|
-| **Agent** | `Cmd + I` | 자율적 코드 작업 (멀티파일 편집, 명령 실행) |
+| **Agent** | `Ctrl + I` | 자율적 코드 작업 (멀티파일 편집, 명령 실행) |
 | **Tab** | `Tab` | AI 자동완성, 다음 편집 위치 예측 |
-| **Inline Edit** | `Cmd + K` | 선택 영역 수정, 빠른 질문 |
+| **Inline Edit** | `Ctrl + K` | 선택 영역 수정, 빠른 질문 |
 
 ---
 
-## Agent 사용법 (Cmd + I)
+## Agent 사용법 (Ctrl + I)
+
+![](003-agent.png)
 
 Agent는 Cursor의 핵심 기능입니다. **자연어로 요청하면 자율적으로 작업을 완료**합니다.
 
 ### 기본 사용
 
-`Cmd + I`로 Agent 패널을 열고 요청을 입력합니다:
+`Ctrl + I`로 Agent 패널을 열고 요청을 입력합니다:
 
 <Source
   language="text"
@@ -74,11 +76,15 @@ make로 빌드하고 에러가 있으면 수정해줘
 
 코드 작성 중 AI가 실시간으로 제안합니다.
 
+![tab](004-tab.png)
+
+> fa만 입력했을떄 lse; 가 제안됨
+
 ### 기본 동작
 
 - **Tab**: 제안 수락
 - **Escape**: 제안 거절
-- **Cmd + →**: 단어 단위 수락
+- **Ctrl + →**: 단어 단위 수락
 
 ### 고급 기능
 
@@ -91,16 +97,21 @@ make로 빌드하고 에러가 있으면 수정해줘
 
 ---
 
-## Inline Edit 사용법 (Cmd + K)
+## Inline Edit 사용법 (Ctrl + K)
 
 선택한 코드 영역을 직접 수정하거나 질문합니다.
+
+
+<img src="007-inline-03.png" alt="Inline Edit 사용 예시" style={{maxWidth: '100%', margin: '24px 0'}} />
+
 
 ### 편집 모드
 
 1. 코드 영역 선택 (또는 커서 위치)
-2. `Cmd + K` 입력
+2. `Ctrl + K` 입력
 3. 수정 지시사항 작성
 4. `Return`으로 실행
+
 
 <Source
   language="text"
@@ -113,35 +124,17 @@ make로 빌드하고 에러가 있으면 수정해줘
 `}
 />
 
-### 빠른 질문 (Opt + Return)
-
-코드를 선택하고 `Cmd + K` → `Opt + Return`으로 질문:
-
-<Source
-  language="text"
-  code={`
-이 함수가 하는 일이 뭐야?
-
-이 로직에서 버그가 있을 수 있어?
-`}
-/>
-
-### 전체 파일 편집 (Cmd + Shift + Return)
-
-파일 전체에 걸친 광범위한 수정:
-
-<Source
-  language="text"
-  code={`
-이 파일의 모든 함수에 Doxygen 주석을 추가해줘
-`}
-/>
 
 ---
 
 ## @ 멘션으로 컨텍스트 지정
 
 Agent와 Chat에서 `@`를 입력하면 특정 파일이나 리소스를 컨텍스트로 추가합니다:
+
+
+![](008-mention-01.png)
+
+![](008-mention-02.png)
 
 | 멘션 | 설명 |
 |------|------|
@@ -166,11 +159,11 @@ Agent와 Chat에서 `@`를 입력하면 특정 파일이나 리소스를 컨텍�
 
 | 기능 | Windows/Linux | macOS |
 |------|--------------|-------|
-| Agent 열기 | `Ctrl + I` | `Cmd + I` |
-| Inline Edit | `Ctrl + K` | `Cmd + K` |
-| 선택 영역을 Chat으로 | `Ctrl + Shift + L` | `Cmd + Shift + L` |
-| 명령 팔레트 | `Ctrl + Shift + P` | `Cmd + Shift + P` |
-| AI 모델 전환 | `Ctrl + /` | `Cmd + /` |
+| Agent 열기 | `Ctrl + I` | `Ctrl + I` |
+| Inline Edit | `Ctrl + K` | `Ctrl + K` |
+| 선택 영역을 Chat으로 | `Ctrl + Shift + L` | `Ctrl + Shift + L` |
+| 명령 팔레트 | `Ctrl + Shift + P` | `Ctrl + Shift + P` |
+| AI 모델 전환 | `Ctrl + /` | `Ctrl + /` |
 
 ---
 
@@ -183,9 +176,9 @@ Agent와 Chat에서 `@`를 입력하면 특정 파일이나 리소스를 컨텍�
   marginTop: '1.5rem'
 }}>
 
-1. **Agent** (`Cmd + I`): 자율적 멀티파일 작업, 빌드, 테스트
+1. **Agent** (`Ctrl + I`): 자율적 멀티파일 작업, 빌드, 테스트
 2. **Tab**: 실시간 AI 자동완성, 다음 편집 예측
-3. **Inline Edit** (`Cmd + K`): 선택 영역 수정/질문
+3. **Inline Edit** (`Ctrl + K`): 선택 영역 수정/질문
 4. **@ 멘션**으로 파일/폴더/웹 컨텍스트 지정
 
 </div>
