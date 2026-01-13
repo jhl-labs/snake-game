@@ -1,26 +1,22 @@
 name: Claude Code Agent
 
 on:
-  # Issue에서 @claude 호출 시 기능 구현
-  issues:
-    types: [opened, assigned]
-  # PR 자동 리뷰 및 코멘트 응답
-  pull_request:
-    types: [opened, synchronize, reopened]
-  # 코멘트에서 @claude 호출
   issue_comment:
     types: [created]
   pull_request_review_comment:
     types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   claude-agent:
-    # @claude 멘션이 있거나, PR 이벤트이거나, claude 라벨이 있는 issue
     if: |
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'claude')) ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
 
     permissions:
@@ -28,12 +24,13 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
+      actions: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Run Claude Code Agent
         uses: anthropics/claude-code-action@v1
@@ -41,22 +38,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # 기능 구현 시 새 브랜치 생성
           branch_prefix: claude/
-          # 디버깅용 전체 출력 활성화
-          show_full_output: true
-          # 작업 지시 프롬프트
-          prompt: |
-            사용자의 요청을 즉시 수행하세요. 질문하지 말고 바로 작업을 시작하세요.
-
-            ## 필수 작업 순서 (기능 구현 시)
-            1. git checkout -b claude/issue-{번호}-{설명} 으로 새 브랜치 생성
-            2. 코드 작성 및 파일 생성
-            3. git add && git commit 으로 커밋
-            4. git push origin {브랜치명}
-            5. gh pr create 로 PR 생성
-
-            ## 코딩 규칙 (CLAUDE.md 참조)
-            - 함수명: snake_case, 타입명: PascalCase
-            - raylib은 renderer.c, main.c에서만 사용
-            - NULL 포인터 체크 필수
-
-            한국어로 응답하세요. 작업 완료 후 결과를 요약해주세요.
+          # CI 결과 읽기 권한
+          additional_permissions: |
+            actions: read
+          # prompt를 지정하지 않으면 Claude가 코멘트 내용을 직접 수행함
