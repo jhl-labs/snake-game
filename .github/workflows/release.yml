@@ -1,0 +1,124 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Extract release notes from CHANGELOG
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          # CHANGELOG.md에서 해당 버전의 내용 추출
+          NOTES=$(awk "/^## \[${VERSION}\]/{flag=1; next} /^## \[v[0-9]/{flag=0} flag" CHANGELOG.md)
+
+          # 내용이 없으면 기본 메시지 사용
+          if [ -z "$NOTES" ]; then
+            NOTES="Release ${VERSION}"
+          fi
+
+          # GitHub Actions output으로 전달 (멀티라인 처리)
+          echo "NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.version.outputs.VERSION }}
+          body: ${{ steps.changelog.outputs.NOTES }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-attach:
+    needs: release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: snake-game-windows.zip
+            build_script: build-windows
+          - os: ubuntu-latest
+            artifact_name: snake-game-linux.tar.gz
+            build_script: build-linux
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Windows 빌드
+      - name: Setup MSYS2 (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: mingw-w64-x86_64-gcc make git
+
+      - name: Build raylib and project (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: msys2 {0}
+        run: |
+          git clone --depth 1 --branch 5.0 https://github.com/raysan5/raylib.git external/raylib-src
+          cd external/raylib-src/src && make PLATFORM=PLATFORM_DESKTOP CC=gcc
+          cd ../../..
+          mkdir -p lib/mingw
+          cp external/raylib-src/src/libraylib.a lib/mingw/
+          make
+
+      - name: Package (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path bin/snake.exe -DestinationPath ${{ matrix.artifact_name }}
+
+      # Linux 빌드
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev
+
+      - name: Build raylib and project (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          git clone --depth 1 --branch 5.0 https://github.com/raysan5/raylib.git external/raylib-src
+          cd external/raylib-src/src && make PLATFORM=PLATFORM_DESKTOP
+          cd ../../..
+          mkdir -p lib/linux
+          cp external/raylib-src/src/libraylib.a lib/linux/
+          make -f Makefile.linux
+
+      - name: Package (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          tar -czvf ${{ matrix.artifact_name }} -C bin snake
+
+      # Release에 바이너리 첨부
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.artifact_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
