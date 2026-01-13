@@ -1,0 +1,269 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ExerciseCard } from '../../../components/ExerciseCard';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/08. 버그 수정 실습/8.3 버그 수정 실습" />
+
+# 8.3 버그 수정 실습
+
+실제 버그가 있는 코드를 Agent로 수정해봅니다.
+
+---
+
+## 실습 진행 흐름
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Progress["버그 수정 실습 단계"]
+        Ex1["🔹 실습 8-1<br/>NULL 체크<br/>(초급)"]
+        Ex2["🔸 실습 8-2<br/>배열 경계<br/>(초급)"]
+        Ex3["🔷 실습 8-3<br/>로직 버그<br/>(중급)"]
+        Ex4["🔴 실습 8-4<br/>복합 버그<br/>(고급)"]
+    end
+
+    Ex1 --> Ex2 --> Ex3 --> Ex4
+`} />
+
+---
+
+## 실습 환경
+
+프로젝트에 `exercises/buggy_snake.c` 파일이 준비되어 있습니다.
+**의도적으로 삽입된 7개의 버그**가 있습니다.
+
+<Placeholder type="image" alt="buggy_snake.c 파일 구조 - 버그 주석이 표시된 코드" />
+
+---
+
+## 실습 8-1: 의도적 버그 찾기
+
+<ExerciseCard
+  number={1}
+  title="NULL 포인터 체크 누락"
+  difficulty="초급"
+  description="snake_init 함수에서 NULL 체크가 누락되어 있습니다."
+  hint="함수 시작 부분을 확인하세요"
+/>
+
+### 버그 있는 코드
+
+<Source
+  language="c"
+  code={`
+// BUG #1: NULL 포인터 체크 누락
+bool snake_init(Snake* p_snake, int start_x, int start_y) {
+    // 여기에 NULL 체크가 없음!
+    p_snake->body[0].x = start_x;
+    p_snake->body[0].y = start_y;
+    p_snake->length = 1;
+    p_snake->direction = DIRECTION_RIGHT;
+    return true;
+}
+`}
+/>
+
+### Agent에게 요청
+
+<Source
+  language="text"
+  code={`
+> exercises/buggy_snake.c의 snake_init 함수에
+> NULL 포인터가 전달되면 크래시가 발생해.
+> NULL 체크를 추가해서 수정해줘.
+`}
+/>
+
+<Placeholder type="video" alt="Agent가 NULL 체크를 추가하는 과정" />
+
+---
+
+## 실습 8-2: 배열 경계 체크 누락
+
+<ExerciseCard
+  number={2}
+  title="배열 오버플로우"
+  difficulty="초급"
+  description="snake_grow 함수에서 MAX_SNAKE_LENGTH 체크가 누락되어 있습니다."
+  hint="length 증가 전 조건 확인"
+/>
+
+### 버그 있는 코드
+
+<Source
+  language="c"
+  code={`
+// BUG #2: 경계 체크 누락
+void snake_grow(Snake* p_snake) {
+    p_snake->length++;  // MAX_SNAKE_LENGTH 체크 없음!
+}
+`}
+/>
+
+### Agent에게 요청
+
+<Source
+  language="text"
+  code={`
+> snake_grow 함수에서 뱀 길이가 MAX_SNAKE_LENGTH를 초과할 때
+> 배열 오버플로우가 발생해. 이 버그를 수정해줘.
+`}
+/>
+
+---
+
+## 실습 8-3: 로직 버그
+
+<ExerciseCard
+  number={3}
+  title="방향 전환 버그"
+  difficulty="중급"
+  description="반대 방향으로 즉시 전환이 가능하여 자기 충돌이 발생합니다."
+  hint="현재 방향과 새 방향의 관계를 확인하세요"
+/>
+
+### 버그 있는 코드
+
+<Source
+  language="c"
+  code={`
+// BUG #3: 반대 방향 체크 누락
+void snake_set_direction(Snake* p_snake, Direction new_dir) {
+    // 반대 방향 체크 없이 바로 변경!
+    p_snake->direction = new_dir;
+}
+`}
+/>
+
+### Agent에게 요청
+
+<Source
+  language="text"
+  code={`
+> 뱀이 현재 오른쪽으로 가고 있을 때 왼쪽 키를 누르면
+> 바로 방향이 바뀌어서 자기 몸통과 충돌해.
+> 반대 방향으로는 바로 전환할 수 없도록 수정해줘.
+`}
+/>
+
+<Placeholder type="image" alt="수정 전후 코드 비교 - 방향 체크 조건 추가" />
+
+---
+
+## 실습 8-4: 복합 버그 수정
+
+<ExerciseCard
+  number={4}
+  title="여러 버그 동시 수정"
+  difficulty="고급"
+  description="파일 전체를 분석하여 모든 버그를 찾아 수정합니다."
+/>
+
+### Agent에게 요청
+
+<Source
+  language="text"
+  code={`
+> exercises/buggy_snake.c 파일에 여러 버그가 있어.
+> 파일 전체를 분석해서 모든 버그를 찾아 수정해줘.
+>
+> 확인할 항목:
+> - NULL 포인터 체크
+> - 배열 경계 체크
+> - 메모리 누수
+> - 로직 오류
+`}
+/>
+
+<Placeholder type="video" alt="Agent가 파일 전체를 분석하고 여러 버그를 순차적으로 수정하는 과정" />
+
+---
+
+## 수정 검증
+
+모든 수정 후 빌드와 테스트로 검증:
+
+<Source
+  language="bash"
+  code={`
+# 빌드
+make
+
+# 테스트 실행
+make test
+
+# 또는 직접 실행하여 확인
+./bin/snake.exe
+`}
+/>
+
+<Placeholder type="image" alt="빌드 성공 및 테스트 통과 메시지" />
+
+---
+
+## 버그 유형 분류
+
+<Mermaid chart={`
+flowchart TB
+    subgraph BugTypes["7가지 버그 유형"]
+        Null["1️⃣ NULL 체크<br/>(초급)"]
+        Array["2️⃣ 배열 경계<br/>(초급)"]
+        Logic["3️⃣ 로직 오류<br/>(중급)"]
+        Memory["4️⃣ 메모리 누수<br/>(중급)"]
+        Init["5️⃣ 초기화 오류<br/>(초급)"]
+        Return["6️⃣ 반환값 미확인<br/>(중급)"]
+        Race["7️⃣ 경쟁 조건<br/>(고급)"]
+    end
+
+    Null --> Array --> Init
+    Logic --> Memory --> Return --> Race
+`} />
+
+## 버그 목록 체크리스트
+
+| # | 버그 | 난이도 | 수정 완료 |
+|---|------|--------|----------|
+| 1 | NULL 포인터 체크 누락 | 초급 | ☐ |
+| 2 | 배열 경계 체크 누락 | 초급 | ☐ |
+| 3 | 반대 방향 전환 가능 | 중급 | ☐ |
+| 4 | 메모리 해제 누락 | 중급 | ☐ |
+| 5 | 초기화 값 오류 | 초급 | ☐ |
+| 6 | 반환값 미확인 | 중급 | ☐ |
+| 7 | 경쟁 조건 | 고급 | ☐ |
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#f0fdf4',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **구체적 증상**으로 버그 설명
+2. **위치를 모르면** Agent가 탐색
+3. 수정 후 반드시 **빌드/테스트** 검증
+4. **복합 요청**으로 여러 버그 동시 처리 가능
+
+</div>
+
+---
+
+## 수고하셨습니다!
+
+4시간의 AI Agent 교육 커리큘럼을 완료하셨습니다.
+
+다음 단계:
+- [Appendix: 유용한 프롬프트 모음](?path=/docs/appendix-prompts--docs)
+- [Appendix: 트러블슈팅](?path=/docs/appendix-troubleshooting--docs)
+- [Exercises: 추가 실습](?path=/docs/exercises-buggy-snake--docs)
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-08-버그-수정-실습-8-2-버그-리포트-형식--docs"
+  prevTitle="8.2 버그 리포트 형식"
+  nextLink="?path=/docs/appendix-prompts--docs"
+  nextTitle="부록: 프롬프트 모음"
+/>

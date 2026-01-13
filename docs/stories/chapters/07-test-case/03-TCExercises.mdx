@@ -1,0 +1,241 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ExerciseCard } from '../../../components/ExerciseCard';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/07. Test Case 작성 실습/7.3 TC 실습" />
+
+# 7.3 TC 실습
+
+실제로 Agent에게 TC를 요청하고 결과를 확인해봅니다.
+
+---
+
+## 실습 진행 흐름
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Progress["실습 단계"]
+        Ex1["🔹 실습 7-1<br/>기본 TC 작성<br/>(초급)"]
+        Ex2["🔸 실습 7-2<br/>복잡한 시나리오<br/>(중급)"]
+        Ex3["🔷 실습 7-3<br/>TC 리뷰 요청<br/>(중급)"]
+        Ex4["🔴 실습 7-4<br/>TC 보완<br/>(고급)"]
+    end
+
+    Ex1 --> Ex2 --> Ex3 --> Ex4
+    Ex4 -.->|"반복 개선"| Ex3
+`} />
+
+---
+
+## 실습 7-1: 기본 TC 작성
+
+<ExerciseCard
+  number={1}
+  title="snake_init 함수 테스트"
+  difficulty="초급"
+  description="뱀 초기화 함수의 기본 동작을 테스트합니다."
+  hint="초기 위치, 길이, 방향을 확인하세요"
+/>
+
+### 요청
+
+<Source
+  language="text"
+  code={`
+> snake.h에 정의된 snake_init 함수에 대한 테스트를 작성해줘.
+>
+> 테스트할 내용:
+> - 초기 위치가 올바르게 설정되는지
+> - 초기 길이가 1인지
+> - 초기 방향이 올바른지
+>
+> tests/test_snake.c 파일에 작성해줘.
+`}
+/>
+
+<Placeholder type="video" alt="Agent가 snake_init 테스트를 생성하는 과정" />
+
+### 예상 결과
+
+<Source
+  language="c"
+  code={`
+void test_snake_init_position(void) {
+    // Arrange
+    Snake snake;
+    int start_x = 5;
+    int start_y = 5;
+
+    // Act
+    snake_init(&snake, start_x, start_y);
+
+    // Assert
+    assert(snake.body[0].x == start_x);
+    assert(snake.body[0].y == start_y);
+    printf("[PASS] test_snake_init_position\\n");
+}
+
+void test_snake_init_length(void) {
+    // Arrange
+    Snake snake;
+
+    // Act
+    snake_init(&snake, 5, 5);
+
+    // Assert
+    assert(snake.length == 1);
+    printf("[PASS] test_snake_init_length\\n");
+}
+`}
+/>
+
+---
+
+## 실습 7-2: 복잡한 시나리오 TC
+
+<ExerciseCard
+  number={2}
+  title="game_update 통합 테스트"
+  difficulty="중급"
+  description="게임 업데이트 함수의 여러 시나리오를 테스트합니다."
+  hint="음식 섭취, 점수 증가, 벽 충돌을 테스트하세요"
+/>
+
+### 요청
+
+<Source
+  language="text"
+  code={`
+> game.c의 game_update 함수에 대한 통합 테스트를 작성해줘.
+>
+> 다음 시나리오를 테스트해야 해:
+> 1. 음식을 먹으면 점수가 증가하는지
+> 2. 음식을 먹으면 뱀 길이가 증가하는지
+> 3. 벽에 충돌하면 게임 오버가 되는지
+>
+> tests/test_game.c 파일에 작성해줘.
+`}
+/>
+
+<Placeholder type="image" alt="통합 테스트 코드가 생성된 모습" />
+
+---
+
+## 실습 7-3: TC 리뷰 요청
+
+<ExerciseCard
+  number={3}
+  title="작성된 TC 리뷰"
+  difficulty="중급"
+  description="Agent가 생성한 테스트 코드를 다시 Agent에게 리뷰 요청합니다."
+/>
+
+### 요청
+
+<Source
+  language="text"
+  code={`
+> tests/test_snake.c 파일의 테스트 케이스를 리뷰해줘.
+>
+> 확인할 사항:
+> - 누락된 테스트 시나리오가 있는지
+> - 코드 품질은 어떤지
+> - 개선할 점은 없는지
+`}
+/>
+
+<Placeholder type="video" alt="Agent가 테스트 코드를 리뷰하고 개선점을 제안하는 과정" />
+
+### 예상 응답
+
+<Source
+  language="text"
+  code={`
+## 테스트 리뷰 결과
+
+### 잘된 점
+- AAA 패턴 적용
+- 각 테스트에 설명 주석
+- assert로 명확한 검증
+
+### 누락된 시나리오
+1. **NULL 입력 테스트**: snake_init(NULL, 5, 5) 케이스 없음
+2. **경계값 테스트**: 맵 끝 좌표 (0, 0), (MAX, MAX) 테스트 없음
+3. **음수 좌표 테스트**: snake_init(&snake, -1, -1)
+
+### 개선 제안
+1. 테스트 함수 분리: 하나의 함수에 여러 assert 대신 개별 함수
+2. 테스트 데이터 분리: 매직 넘버 대신 상수 사용
+3. 실패 메시지 개선: assert에 설명 추가
+`}
+/>
+
+---
+
+## 실습 7-4: TC 보완
+
+<ExerciseCard
+  number={4}
+  title="리뷰 기반 TC 보완"
+  difficulty="고급"
+  description="리뷰에서 지적된 누락 시나리오를 추가합니다."
+/>
+
+### 요청
+
+<Source
+  language="text"
+  code={`
+> 리뷰에서 언급된 누락 테스트를 추가해줘:
+> 1. NULL 입력 테스트
+> 2. 경계값 테스트
+> 3. 음수 좌표 테스트
+`}
+/>
+
+---
+
+## 테스트 실행
+
+작성된 테스트를 실행하여 확인:
+
+<Source
+  language="bash"
+  code={`
+# Makefile에 테스트 타겟이 있는 경우
+make test
+
+# 또는 직접 컴파일
+gcc -o test_runner tests/test_snake.c src/snake.c -Iinclude
+./test_runner
+`}
+/>
+
+<Placeholder type="image" alt="테스트 실행 결과 - 모든 테스트 통과 메시지" />
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#f0fdf4',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **단계별 접근**: 기본 → 복잡 → 리뷰 → 보완
+2. **리뷰 요청**으로 누락 시나리오 발견
+3. **반복 개선**으로 TC 품질 향상
+4. 최종적으로 **빌드/실행**으로 검증
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-07-test-case-작성-실습-7-2-tc-템플릿--docs"
+  prevTitle="7.2 TC 템플릿"
+  nextLink="?path=/docs/chapters-08-버그-수정-실습-8-1-버그-수정-워크플로우--docs"
+  nextTitle="8.1 버그 수정 워크플로우"
+/>

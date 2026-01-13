@@ -1,0 +1,198 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/01. 소개 및 환경 설정/1.2 Cursor 기본 사용법" />
+
+# 1.2 Cursor 기본 사용법
+
+---
+
+## Cursor의 핵심 AI 기능
+
+Cursor는 세 가지 방식으로 AI와 상호작용합니다:
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Cursor["Cursor AI 기능"]
+        Agent["🤖 Agent<br/>Cmd+I"]
+        Tab["⌨️ Tab<br/>자동완성"]
+        Inline["✏️ Inline Edit<br/>Cmd+K"]
+    end
+
+    Agent -->|"자율적 작업"| A["멀티파일 편집, 빌드, 테스트"]
+    Tab -->|"실시간 제안"| B["코드 자동완성, 다음 편집 예측"]
+    Inline -->|"선택 영역"| C["특정 코드 블록 수정/질문"]
+`} />
+
+| 기능 | 단축키 | 용도 |
+|------|--------|------|
+| **Agent** | `Cmd + I` | 자율적 코드 작업 (멀티파일 편집, 명령 실행) |
+| **Tab** | `Tab` | AI 자동완성, 다음 편집 위치 예측 |
+| **Inline Edit** | `Cmd + K` | 선택 영역 수정, 빠른 질문 |
+
+---
+
+## Agent 사용법 (Cmd + I)
+
+Agent는 Cursor의 핵심 기능입니다. **자연어로 요청하면 자율적으로 작업을 완료**합니다.
+
+### 기본 사용
+
+`Cmd + I`로 Agent 패널을 열고 요청을 입력합니다:
+
+<Source
+  language="text"
+  code={`
+# Agent에서 입력
+이 프로젝트의 구조를 설명해줘
+
+# 코드 수정 요청
+snake_move 함수에 NULL 체크를 추가해줘
+
+# 멀티파일 작업
+새로운 power-up 시스템을 추가해줘. power_up.h와 power_up.c를 생성하고 game.c에 통합해줘
+
+# 빌드 및 테스트
+make로 빌드하고 에러가 있으면 수정해줘
+`}
+/>
+
+### Agent의 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| **Tools** | 파일 읽기/편집, 터미널 명령 실행, 코드베이스 검색 |
+| **Checkpoints** | 작업 중 자동 스냅샷, 이전 상태로 복원 가능 |
+| **Browser** | 웹 브라우저와 상호작용하여 테스트/정보 수집 |
+| **Rules** | 프로젝트별 코딩 규칙 적용 (`.cursor/rules`) |
+
+---
+
+## Tab 자동완성
+
+코드 작성 중 AI가 실시간으로 제안합니다.
+
+### 기본 동작
+
+- **Tab**: 제안 수락
+- **Escape**: 제안 거절
+- **Cmd + →**: 단어 단위 수락
+
+### 고급 기능
+
+| 기능 | 설명 |
+|------|------|
+| **파일 내 점프** | 다음 편집 위치를 예측하여 자동 이동 |
+| **파일 간 점프** | 다른 파일의 관련 코드 수정 제안 |
+| **자동 임포트** | TypeScript/Python에서 누락된 import 자동 추가 |
+
+
+---
+
+## Inline Edit 사용법 (Cmd + K)
+
+선택한 코드 영역을 직접 수정하거나 질문합니다.
+
+### 편집 모드
+
+1. 코드 영역 선택 (또는 커서 위치)
+2. `Cmd + K` 입력
+3. 수정 지시사항 작성
+4. `Return`으로 실행
+
+<Source
+  language="text"
+  code={`
+# 선택한 함수에 대해
+이 함수에 에러 핸들링을 추가해줘
+
+# 리팩토링
+이 코드를 더 읽기 쉽게 개선해줘
+`}
+/>
+
+### 빠른 질문 (Opt + Return)
+
+코드를 선택하고 `Cmd + K` → `Opt + Return`으로 질문:
+
+<Source
+  language="text"
+  code={`
+이 함수가 하는 일이 뭐야?
+
+이 로직에서 버그가 있을 수 있어?
+`}
+/>
+
+### 전체 파일 편집 (Cmd + Shift + Return)
+
+파일 전체에 걸친 광범위한 수정:
+
+<Source
+  language="text"
+  code={`
+이 파일의 모든 함수에 Doxygen 주석을 추가해줘
+`}
+/>
+
+---
+
+## @ 멘션으로 컨텍스트 지정
+
+Agent와 Chat에서 `@`를 입력하면 특정 파일이나 리소스를 컨텍스트로 추가합니다:
+
+| 멘션 | 설명 |
+|------|------|
+| `@파일명` | 특정 파일을 컨텍스트에 추가 |
+| `@폴더명` | 폴더 전체를 컨텍스트에 추가 |
+| `@Codebase` | 전체 코드베이스 검색 |
+| `@Web` | 웹 검색 결과 포함 |
+| `@Docs` | 문서 검색 |
+
+<Source
+  language="text"
+  code={`
+@snake.c @snake.h 이 파일들에서 뱀의 방향 전환은 어떻게 구현되어 있어?
+
+@Codebase 충돌 감지 로직이 어디에 구현되어 있어?
+`}
+/>
+
+---
+
+## 주요 단축키 정리
+
+| 기능 | Windows/Linux | macOS |
+|------|--------------|-------|
+| Agent 열기 | `Ctrl + I` | `Cmd + I` |
+| Inline Edit | `Ctrl + K` | `Cmd + K` |
+| 선택 영역을 Chat으로 | `Ctrl + Shift + L` | `Cmd + Shift + L` |
+| 명령 팔레트 | `Ctrl + Shift + P` | `Cmd + Shift + P` |
+| AI 모델 전환 | `Ctrl + /` | `Cmd + /` |
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **Agent** (`Cmd + I`): 자율적 멀티파일 작업, 빌드, 테스트
+2. **Tab**: 실시간 AI 자동완성, 다음 편집 예측
+3. **Inline Edit** (`Cmd + K`): 선택 영역 수정/질문
+4. **@ 멘션**으로 파일/폴더/웹 컨텍스트 지정
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-01-소개-및-환경-설정-1-1-ai-agent란--docs"
+  prevTitle="1.1 AI Agent란"
+  nextLink="?path=/docs/chapters-01-소개-및-환경-설정-1-3-claude-code-기본-사용법--docs"
+  nextTitle="1.3 Claude Code 기본 사용법"
+/>

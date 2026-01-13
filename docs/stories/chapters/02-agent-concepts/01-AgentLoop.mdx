@@ -1,0 +1,198 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/02. Agent 기본 개념/2.1 Agent 동작 원리" />
+
+# Chapter 2: Agent 기본 개념
+
+**예상 소요 시간: 30분**
+
+---
+
+## 2.1 Agent의 동작 원리
+
+AI Agent는 **Agent Loop**라는 반복 패턴으로 동작합니다.
+
+### Agent Loop 다이어그램
+
+<Mermaid chart={`
+flowchart TB
+    subgraph AgentLoop["Agent Loop"]
+        direction TB
+        Input["👤 사용자 입력<br/>'버그를 찾아줘'"]
+        Think["🧠 LLM 추론<br/>무엇을 해야 할까?"]
+        Decide{도구 필요?}
+
+        subgraph Tools["도구 실행"]
+            Read["📖 Read"]
+            Grep["🔍 Grep"]
+            Edit["✏️ Edit"]
+            Bash["⚡ Bash"]
+        end
+
+        Observe["👁️ 결과 관찰"]
+        Response["💬 응답 생성"]
+    end
+
+    Input --> Think
+    Think --> Decide
+    Decide -->|"예"| Tools
+    Tools --> Observe
+    Observe -->|"추가 작업 필요"| Think
+    Decide -->|"아니오"| Response
+    Observe -->|"작업 완료"| Response
+`} />
+
+### 단계별 설명
+
+| 단계 | 설명 | 예시 |
+|------|------|------|
+| **1. 사용자 입력** | 자연어로 작업 요청 | "snake.c에서 버그를 찾아줘" |
+| **2. LLM 추론** | 요청 분석, 필요한 도구 결정 | "파일을 읽어야겠군, Read 도구 사용" |
+| **3. 도구 실행** | 실제 작업 수행 | `Read("src/snake.c")` 실행 |
+| **4. 결과 피드백** | 도구 결과를 LLM에 전달 | 파일 내용 → LLM |
+| **5. 반복** | 필요시 추가 도구 실행 | 다른 파일 읽기, 검색 등 |
+| **6. 응답 생성** | 최종 결과 사용자에게 전달 | "버그를 찾았습니다..." |
+
+---
+
+## 실제 동작 예시
+
+### 요청
+
+<Source
+  language="text"
+  code={`
+> snake.c에서 snake_move 함수를 찾아서 설명해줘
+`}
+/>
+
+### Agent의 내부 동작
+
+<Mermaid chart={`
+sequenceDiagram
+    participant User as 👤 사용자
+    participant LLM as 🧠 LLM
+    participant Grep as 🔍 Grep
+    participant Read as 📖 Read
+
+    User->>LLM: snake_move 함수를 찾아서 설명해줘
+
+    Note over LLM: 추론: 함수를 검색해야 함
+    LLM->>Grep: pattern="snake_move", path="src/"
+    Grep-->>LLM: src/snake.c:45에서 발견
+
+    Note over LLM: 추론: 코드를 읽어야 함
+    LLM->>Read: file="src/snake.c", lines=45-80
+    Read-->>LLM: 함수 코드 반환
+
+    Note over LLM: 추론: 코드 분석 후 설명 생성
+    LLM->>User: snake_move 함수는 뱀의 위치를<br/>업데이트하는 함수입니다...
+`} />
+
+---
+
+## 도구 호출의 특징
+
+### 자동 도구 선택
+
+Agent는 요청에 따라 **적절한 도구를 자동 선택**합니다:
+
+| 요청 | 선택되는 도구 |
+|------|--------------|
+| "파일 읽어줘" | Read |
+| "함수 찾아줘" | Grep, Glob |
+| "코드 수정해줘" | Edit |
+| "빌드해줘" | Bash |
+| "새 파일 만들어줘" | Write |
+
+### 도구 체이닝
+
+복잡한 요청은 **여러 도구를 연속 호출**합니다:
+
+<Mermaid chart={`
+flowchart LR
+    A["요청: NULL 체크 추가"] --> B["🔍 Grep<br/>위치 파악"]
+    B --> C["📖 Read<br/>현재 코드 확인"]
+    C --> D["✏️ Edit<br/>코드 수정"]
+    D --> E["📖 Read<br/>결과 검증"]
+    E --> F["✅ 완료"]
+`} />
+
+<Source
+  language="text"
+  code={`
+요청: "snake.c의 snake_grow 함수에 NULL 체크를 추가해줘"
+
+Agent 동작:
+1. Grep("snake_grow") → 위치 파악
+2. Read("src/snake.c") → 현재 코드 확인
+3. Edit("src/snake.c", ...) → 코드 수정
+4. Read("src/snake.c") → 수정 결과 확인
+`}
+/>
+
+---
+
+## Cursor vs Claude Code에서 Agent Loop 관찰
+
+### Cursor
+
+Agent 패널(`Cmd+I`)에서 도구 호출 과정이 **실시간으로 표시**됩니다:
+
+<Source
+  language="text"
+  code={`
+# Agent 패널에서 확인 가능:
+◐ Searching codebase...
+◐ Reading src/snake.c...
+◐ Editing file...
+`}
+/>
+
+### Claude Code
+
+`--verbose` 옵션으로 상세 동작을 확인할 수 있습니다:
+
+<Source
+  language="bash"
+  code={`
+claude --verbose
+
+> snake_move 함수를 찾아서 설명해줘
+
+# 출력:
+# [Tool Call] Grep(pattern="snake_move", path="src/")
+# [Tool Result] Found in src/snake.c:45
+# [Tool Call] Read(file="src/snake.c", offset=45, limit=35)
+# [Tool Result] (파일 내용)
+`}
+/>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ecfdf5',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. Agent는 **Agent Loop** 패턴으로 동작 (추론 → 도구 실행 → 관찰 → 반복)
+2. **LLM이 도구 선택**을 결정하고 실행
+3. 결과를 **피드백**받아 추가 작업 수행
+4. 복잡한 요청은 **여러 도구를 체이닝**
+5. **Cursor**: Agent 패널에서 실시간 확인 / **Claude Code**: `--verbose` 옵션
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-01-소개-및-환경-설정-1-3-claude-code-기본-사용법--docs"
+  prevTitle="1.3 Claude Code 기본 사용법"
+  nextLink="?path=/docs/chapters-02-agent-기본-개념-2-2-agent-도구--docs"
+  nextTitle="2.2 Agent가 사용하는 도구들"
+/>

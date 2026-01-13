@@ -1,0 +1,226 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ExerciseCard } from '../../../components/ExerciseCard';
+import { ChapterNav } from '../../../components/ChapterNav';
+
+<Meta title="Chapters/03. Rule 파일 작성/3.3 효과적인 Rule 작성" />
+
+# 3.3 효과적인 Rule 작성법
+
+Rule 파일을 잘 작성하면 Agent가 **일관되고 정확한 코드**를 생성합니다.
+여기서는 효과적인 Rule 작성 팁을 알아봅니다.
+
+---
+
+## 팁 1: 구체적으로 작성하기
+
+### 나쁜 예
+
+<Source
+  language="markdown"
+  code={`
+## 함수 규칙
+- 좋은 함수를 작성하세요
+- 깔끔하게 만드세요
+`}
+/>
+
+### 좋은 예
+
+<Source
+  language="markdown"
+  code={`
+## 함수 규칙
+- 함수는 **50줄**을 넘지 않도록 합니다
+- 매개변수는 최대 **4개**까지만 허용합니다
+- **단일 책임 원칙**: 하나의 함수는 하나의 작업만 수행
+- 중첩 깊이는 **3단계** 이하로 유지
+`}
+/>
+
+---
+
+## 팁 2: 예시 코드 포함하기
+
+Agent는 **예시 코드를 참고**하여 비슷한 스타일로 생성합니다.
+
+<Source
+  language="markdown"
+  code={`
+## 에러 처리 패턴
+
+모든 포인터 매개변수는 함수 시작 시 NULL 체크해야 합니다.
+
+### 예시
+
+\`\`\`c
+bool snake_move(Snake* p_snake, Direction direction) {
+    // NULL 체크는 함수 시작 부분에서
+    if (p_snake == NULL) {
+        fprintf(stderr, "Error: NULL pointer in snake_move\\n");
+        return false;
+    }
+
+    // 실제 로직 수행
+    // ...
+
+    return true;
+}
+\`\`\`
+`}
+/>
+
+
+---
+
+## 팁 3: 컨텍스트 제공하기
+
+프로젝트의 **배경 정보**를 Rule에 포함하면 Agent가 더 적절한 판단을 합니다.
+
+<Source
+  language="markdown"
+  code={`
+# 프로젝트 개요
+
+## 기술 스택
+- **언어**: C (C11 표준)
+- **그래픽**: raylib 4.5
+- **플랫폼**: Windows (MinGW-w64)
+- **아키텍처**: MVC 패턴
+
+## 파일 구조
+- \`src/\`: 소스 파일 (.c)
+- \`include/\`: 헤더 파일 (.h)
+- \`lib/\`: 컴파일된 라이브러리
+
+## 빌드 명령어
+- \`make\`: 프로젝트 빌드
+- \`make clean\`: 빌드 파일 정리
+- \`make run\`: 빌드 후 실행
+`}
+/>
+
+---
+
+## 팁 4: 금지 사항 명시하기
+
+**하지 말아야 할 것**을 명확히 하면 실수를 방지합니다.
+
+<Source
+  language="markdown"
+  code={`
+## 금지 사항
+
+### 절대 하지 말 것
+- ❌ Model/Logic 계층에서 raylib 사용
+- ❌ goto 문 사용
+- ❌ 매직 넘버 사용 (상수 정의 필수)
+- ❌ 메모리 할당 후 해제하지 않음
+
+### 피해야 할 것
+- ⚠️ 전역 변수 과다 사용
+- ⚠️ 50줄 이상의 함수
+- ⚠️ 3단계 이상의 중첩
+`}
+/>
+
+---
+
+## 팁 5: 테이블과 다이어그램 활용
+
+**시각적 정보**는 Agent가 구조를 이해하는 데 도움됩니다.
+
+<Source
+  language="markdown"
+  code={`
+## 계층별 책임
+
+| 계층 | 파일 | 책임 | raylib |
+|------|------|------|--------|
+| Model | snake.c, food.c | 데이터 구조 | ❌ |
+| Logic | game.c | 게임 규칙 | ❌ |
+| View | renderer.c | 화면 출력 | ✅ |
+| Controller | main.c | 입력 처리 | ✅ |
+
+## 의존성 흐름
+
+\`\`\`
+Controller → Logic → Model
+     ↓         ↓
+   View ───────┘
+\`\`\`
+`}
+/>
+
+---
+
+## 실습 3-2: Rule 파일 개선하기
+
+기존 Rule 파일을 개선해보세요.
+
+<ExerciseCard
+  number={1}
+  title="memory-management/RULE.md 개선"
+  difficulty="중급"
+  description="메모리 관리 규칙에 구체적인 예시 코드를 추가합니다."
+  hint="malloc/free 패턴, NULL 초기화 예시를 포함하세요"
+/>
+
+<ExerciseCard
+  number={2}
+  title="새로운 Rule 파일 생성"
+  difficulty="중급"
+  description="주석 작성 규칙을 정의하는 documentation/RULE.md를 만듭니다."
+  hint="Doxygen 스타일 주석, TODO/FIXME 형식을 포함하세요"
+/>
+
+---
+
+## 실습 3-3: Rule 적용 확인
+
+<Source
+  language="text"
+  code={`
+# Cursor Chat에서
+snake.c에 새로운 함수 snake_reset()을 추가해줘.
+게임 재시작 시 뱀을 초기 상태로 되돌리는 함수야.
+`}
+/>
+
+
+### 확인 포인트
+
+Agent가 생성한 코드에서 확인할 것:
+
+- [ ] 함수명이 `snake_case`인가?
+- [ ] NULL 체크가 있는가?
+- [ ] Doxygen 주석이 있는가?
+- [ ] 에러 처리 패턴을 따르는가?
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+**효과적인 Rule 작성 5가지 팁:**
+
+1. **구체적으로** - 숫자와 기준 명시
+2. **예시 포함** - 코드 예시로 스타일 전달
+3. **컨텍스트** - 프로젝트 배경 정보 제공
+4. **금지 사항** - 하지 말아야 할 것 명확히
+5. **시각화** - 테이블과 다이어그램 활용
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-03-rule-파일-작성-3-2-rule-메타데이터--docs"
+  prevTitle="3.2 Rule 메타데이터"
+  nextLink="?path=/docs/chapters-04-command-파일-작성-4-1-cursor-command-파일--docs"
+  nextTitle="4.1 Cursor Command 파일"
+/>

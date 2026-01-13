@@ -1,0 +1,237 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/08. 버그 수정 실습/8.1 버그 수정 워크플로우" />
+
+# Chapter 8: 버그 수정 실습
+
+**예상 소요 시간: 30분**
+
+---
+
+## 8.1 Agent를 활용한 버그 수정 프로세스
+
+Agent에게 버그 수정을 요청할 때 효과적인 워크플로우를 알아봅니다.
+
+---
+
+## 버그 수정 워크플로우
+
+<Mermaid chart={`
+flowchart TB
+    subgraph Workflow["Bug Fix Workflow"]
+        Report["📝 1. 버그 리포트<br/>문제 현상 기술"]
+        Analyze["🔍 2. 원인 분석<br/>코드 탐색, 분석"]
+        Plan["📋 3. 수정 계획<br/>방법 결정"]
+        Fix["✏️ 4. 코드 수정<br/>Edit 도구"]
+        Test["🧪 5. 테스트 검증<br/>빌드, 실행"]
+        Review["✅ 6. 리뷰<br/>품질 확인"]
+    end
+
+    Report --> Analyze --> Plan --> Fix --> Test --> Review
+    Test -->|"실패"| Analyze
+`} />
+
+### 각 단계 설명
+
+| 단계 | 설명 | Agent 역할 |
+|------|------|-----------|
+| **1. 버그 리포트** | 문제 현상 기술 | 정보 수집 |
+| **2. 원인 분석** | 버그 원인 파악 | 코드 탐색, 분석 |
+| **3. 수정 계획** | 수정 방법 결정 | 대안 제시 |
+| **4. 코드 수정** | 실제 코드 변경 | Edit 도구 사용 |
+| **5. 테스트 검증** | 수정 확인 | 빌드, 테스트 실행 |
+| **6. 리뷰** | 품질 확인 | 코드 리뷰 |
+
+---
+
+## Agent에게 버그 수정 요청하기
+
+### 기본 패턴
+
+<Source
+  language="text"
+  code={`
+> [버그 위치]에서 [증상]이 발생해.
+> [재현 방법/추가 정보]
+> 원인을 찾아서 수정해줘.
+`}
+/>
+
+### 예시 1: 위치를 아는 경우
+
+<Source
+  language="text"
+  code={`
+> snake.c의 snake_grow 함수에서 배열 오버플로우가 발생해.
+> 뱀 길이가 MAX_SNAKE_LENGTH를 초과할 때 크래시가 나.
+> 경계 체크를 추가해서 수정해줘.
+`}
+/>
+
+### 예시 2: 위치를 모르는 경우
+
+<Source
+  language="text"
+  code={`
+> 게임 중에 음식을 먹으면 가끔 크래시가 발생해.
+> 에러 메시지: "Segmentation fault"
+> 원인을 찾아서 수정해줘.
+`}
+/>
+
+---
+
+## Agent의 버그 수정 과정
+
+<Mermaid chart={`
+sequenceDiagram
+    participant User as 👤 사용자
+    participant Agent as 🤖 Agent
+    participant Grep as 🔍 Grep
+    participant Read as 📖 Read
+    participant Edit as ✏️ Edit
+    participant Bash as ⚡ Bash
+
+    User->>Agent: snake_grow에서 오버플로우 발생
+
+    Note over Agent: 1. 코드 탐색
+    Agent->>Grep: snake_grow 검색
+    Grep-->>Agent: src/snake.c:45
+
+    Note over Agent: 2. 코드 분석
+    Agent->>Read: snake.c 읽기
+    Read-->>Agent: 함수 코드
+
+    Note over Agent: 3. 원인 진단<br/>"경계 체크 누락"
+
+    Note over Agent: 4. 코드 수정
+    Agent->>Edit: if 조건 추가
+    Edit-->>Agent: 수정 완료
+
+    Note over Agent: 5. 빌드 검증
+    Agent->>Bash: make
+    Bash-->>Agent: 빌드 성공
+
+    Agent->>User: 수정 완료!
+`} />
+
+---
+
+## 버그 유형별 접근
+
+<Mermaid chart={`
+flowchart TB
+    Bug["🐛 버그 발생"]
+
+    Bug --> Runtime["⚠️ 런타임 에러<br/>Segfault, Crash"]
+    Bug --> Logic["❓ 논리 에러<br/>잘못된 동작"]
+    Bug --> Memory["💾 메모리 에러<br/>누수, 오버플로우"]
+
+    Runtime --> R1["스택 트레이스 확인"]
+    Runtime --> R2["NULL 체크 추가"]
+
+    Logic --> L1["예상 vs 실제 비교"]
+    Logic --> L2["조건문 검토"]
+
+    Memory --> M1["malloc/free 추적"]
+    Memory --> M2["배열 경계 확인"]
+`} />
+
+### 1. 런타임 에러
+
+<Source
+  language="text"
+  code={`
+> 실행 중 Segmentation fault가 발생해.
+> 디버그 정보: [파일:라인] 또는 [스택 트레이스]
+> 원인을 찾아줘.
+`}
+/>
+
+### 2. 논리 에러
+
+<Source
+  language="text"
+  code={`
+> 뱀이 위로 이동할 때 아래로 이동해.
+> 예상: y좌표 감소
+> 실제: y좌표 증가
+> direction 처리 코드를 확인해줘.
+`}
+/>
+
+### 3. 메모리 에러
+
+<Source
+  language="text"
+  code={`
+> 게임을 오래 실행하면 메모리 사용량이 계속 증가해.
+> 메모리 누수가 있는 것 같아.
+> malloc/free 패턴을 확인해줘.
+`}
+/>
+
+---
+
+## Cursor vs Claude Code에서 버그 수정
+
+### Cursor
+
+<Source
+  language="text"
+  code={`
+# Cmd + I로 Agent 열기
+snake.c의 snake_grow 함수에서 배열 오버플로우가 발생해.
+경계 체크를 추가해서 수정해줘.
+
+# Agent가 자동으로:
+# - 파일 검색
+# - 코드 분석
+# - 수정 제안/적용
+`}
+/>
+
+### Claude Code
+
+<Source
+  language="bash"
+  code={`
+claude
+
+> snake.c의 snake_grow 함수에서 배열 오버플로우가 발생해.
+> 경계 체크를 추가해서 수정해줘.
+
+# 도구 호출 과정이 표시됨
+# ◐ Searching for snake_grow...
+# ◐ Reading src/snake.c...
+# ◐ Editing file...
+`}
+/>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ecfdf5',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **워크플로우**: 리포트 → 분석 → 계획 → 수정 → 검증 → 리뷰
+2. **구체적 정보** 제공: 위치, 증상, 재현 방법
+3. 위치를 모르면 Agent가 **탐색**
+4. 수정 후 반드시 **빌드/테스트**로 검증
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-07-test-case-작성-실습-7-3-tc-실습--docs"
+  prevTitle="7.3 TC 실습"
+  nextLink="?path=/docs/chapters-08-버그-수정-실습-8-2-버그-리포트-형식--docs"
+  nextTitle="8.2 버그 리포트 형식"
+/>

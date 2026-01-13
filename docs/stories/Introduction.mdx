@@ -1,0 +1,103 @@
+import { Meta } from '@storybook/blocks';
+import { Placeholder } from '../components/Placeholder';
+
+<Meta title="Introduction" />
+
+# AI Agent 교육 커리큘럼
+
+> **Cursor**와 **Claude Code**를 활용한 AI 기반 개발 실습 가이드
+
+
+---
+
+## 과정 개요
+
+| 항목 | 내용 |
+|------|------|
+| **총 교육 시간** | 4시간 |
+| **실습 프로젝트** | Snake Game (C, raylib) |
+| **필요 환경** | Windows / Linux |
+
+---
+
+## 학습 목표
+
+이 과정을 완료하면 다음을 할 수 있습니다:
+
+1. **AI Agent의 동작 원리 이해** - LLM 기반 코딩 어시스턴트가 어떻게 작동하는지 파악
+2. **Rule 파일 작성** - 프로젝트별 코딩 규칙을 Agent에게 학습시키기
+3. **Command 파일 활용** - 반복 작업을 자동화하는 커맨드 정의
+4. **Subagent 활용** - 복잡한 작업을 분업하여 처리
+5. **실전 활용** - 테스트 케이스 작성, 버그 수정에 Agent 활용
+
+---
+
+## 커리큘럼
+
+| 챕터 | 제목 | 시간 | 핵심 내용 |
+|------|------|------|----------|
+| 1 | 소개 및 환경 설정 | 30분 | Cursor/Claude Code 설치, 프로젝트 구조 파악 |
+| 2 | Agent 기본 개념 | 30분 | Agent Loop, 도구, 컨텍스트 |
+| 3 | Rule 파일 작성 | 45분 | .cursor/rules/, 메타데이터, 효과적인 규칙 |
+| 4 | Command 파일 작성 | 45분 | 커맨드 정의, 슬래시 커맨드 |
+| 5 | CLAUDE.md 및 agent.md | 30분 | 프로젝트 가이드 문서 작성 |
+| 6 | Subagent와 Agent Skills | 30분 | Task tool, Background Agent |
+| 7 | Test Case 작성 실습 | 30분 | AAA 패턴, Agent로 TC 생성 |
+| 8 | 버그 수정 실습 | 30분 | 버그 리포트, 디버깅 요청 |
+
+---
+
+## 실습 프로젝트 소개
+
+### Snake Game
+
+<img
+  src="001.gif"
+  alt="Snake Game 실행 화면 - 초록색 뱀이 빨간 음식을 향해 이동하는 모습"
+  style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }}
+/>
+
+**기술 스택:**
+- **언어**: C (C11 표준)
+- **그래픽**: raylib
+- **빌드**: Make (MinGW-w64)
+- **아키텍처**: MVC 패턴
+
+**프로젝트 구조:**
+```
+snake-game/
+├── src/                # 소스 코드
+│   ├── main.c          # 진입점, 게임 루프
+│   ├── game.c          # 게임 로직
+│   ├── snake.c         # 뱀 모델
+│   ├── food.c          # 음식 모델
+│   └── renderer.c      # 렌더링 (raylib)
+├── include/            # 헤더 파일
+├── .cursor/            # Cursor 설정
+│   ├── rules/          # 코딩 규칙
+│   └── commands/       # 커맨드
+├── .claude/            # Claude Code 설정
+│   ├── rules/          # 코딩 규칙
+│   ├── commands/       # 슬래시 커맨드
+│   └── skills/         # 에이전트 스킬
+├── exercises/          # 실습 파일
+├── CLAUDE.md           # 프로젝트 가이드
+└── Makefile
+```
+
+---
+
+## 시작하기
+
+왼쪽 사이드바에서 **Chapters > 01. 소개 및 환경 설정**을 클릭하여 학습을 시작하세요.
+
+<div style={{
+  marginTop: '2rem',
+  padding: '1rem',
+  backgroundColor: '#eff6ff',
+  borderRadius: '8px',
+  borderLeft: '4px solid #3b82f6'
+}}>
+  <strong>Tip:</strong> 각 챕터는 순서대로 진행하는 것을 권장합니다.
+  실습 중 막히는 부분이 있으면 <strong>Appendix</strong>의 트러블슈팅을 참고하세요.
+</div>

@@ -1,0 +1,224 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/08. 버그 수정 실습/8.2 버그 리포트 형식" />
+
+# 8.2 버그 리포트 형식
+
+Agent에게 버그를 효과적으로 설명하면 더 정확한 수정을 받을 수 있습니다.
+
+---
+
+## 버그 리포트 구조
+
+<Mermaid chart={`
+flowchart TB
+    subgraph Report["버그 리포트"]
+        Symptom["🔴 증상<br/>무엇이 잘못되었는지"]
+        Repro["📋 재현 방법<br/>단계별 설명"]
+        Expected["✅ 예상 동작<br/>정상적인 동작"]
+        Actual["❌ 실제 동작<br/>현재 발생하는 문제"]
+        Files["📁 관련 파일<br/>코드 위치"]
+        Error["⚠️ 에러 메시지<br/>로그, 스택트레이스"]
+    end
+
+    Symptom --> Repro
+    Repro --> Expected
+    Expected --> Actual
+    Actual --> Files
+    Files --> Error
+`} />
+
+---
+
+## 버그 리포트 템플릿
+
+<Source
+  language="markdown"
+  code={`
+## 버그 리포트
+
+### 증상
+[어떤 문제가 발생하는지]
+
+### 재현 방법
+1. [단계 1]
+2. [단계 2]
+3. [문제 발생]
+
+### 예상 동작
+[정상적으로 동작해야 하는 방식]
+
+### 실제 동작
+[실제로 발생하는 문제]
+
+### 관련 파일
+- [파일 1]
+- [파일 2]
+
+### 에러 메시지 (있는 경우)
+\`\`\`
+[에러 메시지 내용]
+\`\`\`
+`}
+/>
+
+<Placeholder type="image" alt="버그 리포트 템플릿이 작성된 모습" />
+
+---
+
+## 좋은 버그 리포트 예시
+
+<Source
+  language="markdown"
+  code={`
+## 버그 리포트
+
+### 증상
+게임 실행 중 음식을 먹으면 프로그램이 크래시됨
+
+### 재현 방법
+1. 게임 시작
+2. 뱀을 음식 방향으로 이동
+3. 음식을 먹는 순간 크래시
+
+### 예상 동작
+뱀 길이가 증가하고 새 음식이 생성되어야 함
+
+### 실제 동작
+Segmentation fault 발생
+
+### 관련 파일
+- src/snake.c (snake_grow 함수)
+- src/food.c (food_spawn 함수)
+
+### 에러 메시지
+\`\`\`
+Segmentation fault at snake.c:45
+\`\`\`
+`}
+/>
+
+---
+
+## Agent에게 요청하는 형식
+
+### 상세 요청
+
+<Source
+  language="text"
+  code={`
+> 다음 버그를 수정해줘:
+>
+> **증상**: 음식을 먹으면 크래시
+> **위치**: snake.c의 snake_grow 함수
+> **에러**: Segmentation fault at line 45
+> **재현**: 음식과 충돌할 때마다 발생
+>
+> 원인을 분석하고 수정해줘.
+`}
+/>
+
+### 간단 요청 (위치를 아는 경우)
+
+<Source
+  language="text"
+  code={`
+> snake.c:45에서 Segmentation fault가 발생해.
+> snake_grow 함수에서 배열 범위를 벗어나는 것 같아.
+> 수정해줘.
+`}
+/>
+
+### 탐색 요청 (위치를 모르는 경우)
+
+<Source
+  language="text"
+  code={`
+> 게임 중 가끔 크래시가 발생해.
+> 정확한 위치는 모르겠지만 음식 관련 코드인 것 같아.
+> 원인을 찾아서 수정해줘.
+`}
+/>
+
+<Placeholder type="video" alt="Agent가 버그 리포트를 분석하고 해당 코드를 찾아가는 과정" />
+
+---
+
+## 디버깅 정보 제공
+
+### 에러 메시지
+
+<Source
+  language="text"
+  code={`
+> 다음 에러가 발생해:
+>
+> \`\`\`
+> Segmentation fault (core dumped)
+> \`\`\`
+>
+> 이 문제를 분석하고 수정해줘.
+`}
+/>
+
+### 스택 트레이스
+
+<Source
+  language="text"
+  code={`
+> 다음 스택 트레이스와 함께 크래시가 발생해:
+>
+> \`\`\`
+> #0 snake_grow (p_snake=0x0) at snake.c:45
+> #1 game_update (p_game=0x7fff...) at game.c:78
+> #2 main () at main.c:52
+> \`\`\`
+>
+> NULL 포인터 문제인 것 같아. 수정해줘.
+`}
+/>
+
+### 로그 출력
+
+<Source
+  language="text"
+  code={`
+> 실행 중 다음 로그가 출력돼:
+>
+> \`\`\`
+> [DEBUG] snake length: 10
+> [DEBUG] snake length: 11
+> [ERROR] Array index out of bounds
+> \`\`\`
+>
+> 배열 크기 문제를 수정해줘.
+`}
+/>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **템플릿 사용**: 증상, 재현, 예상/실제 동작
+2. **구체적 정보**: 파일, 라인, 에러 메시지
+3. **디버깅 정보**: 스택 트레이스, 로그 포함
+4. 정보가 많을수록 **정확한 수정**
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-08-버그-수정-실습-8-1-버그-수정-워크플로우--docs"
+  prevTitle="8.1 버그 수정 워크플로우"
+  nextLink="?path=/docs/chapters-08-버그-수정-실습-8-3-버그-수정-실습--docs"
+  nextTitle="8.3 버그 수정 실습"
+/>

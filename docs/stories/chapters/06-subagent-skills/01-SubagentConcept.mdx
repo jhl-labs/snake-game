@@ -1,0 +1,189 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/06. Subagent와 Agent Skills/6.1 Subagent 개념" />
+
+# Chapter 6: Subagent와 Agent Skills
+
+**예상 소요 시간: 30분**
+
+---
+
+## 6.1 Subagent 개념
+
+Subagent는 **특정 작업에 특화된 보조 Agent**입니다.
+메인 Agent가 복잡한 작업을 분업하여 처리할 때 사용됩니다.
+
+---
+
+## Subagent의 역할
+
+<Mermaid chart={`
+flowchart TB
+    subgraph MainAgent["🤖 Main Agent"]
+        Request["복잡한 요청 수신"]
+        Analyze["작업 분석"]
+        Delegate["작업 분배"]
+        Combine["결과 통합"]
+    end
+
+    subgraph Subagents["Subagents"]
+        Explore["🔍 Explore<br/>코드 탐색"]
+        Plan["📋 Plan<br/>계획 수립"]
+        General["⚙️ general-purpose<br/>복합 작업"]
+    end
+
+    Request --> Analyze --> Delegate
+    Delegate --> Explore
+    Delegate --> Plan
+    Delegate --> General
+    Explore --> Combine
+    Plan --> Combine
+    General --> Combine
+    Combine --> Response["최종 응답"]
+`} />
+
+### 왜 Subagent가 필요한가?
+
+| 상황 | 단일 Agent | Subagent 활용 |
+|------|-----------|---------------|
+| 대규모 코드 탐색 | 느림, 컨텍스트 부족 | 빠름, 전문화된 탐색 |
+| 복잡한 작업 | 중간에 실패 가능 | 단계별 안정 실행 |
+| 병렬 작업 | 불가능 | 동시 실행 가능 |
+
+---
+
+## Claude Code의 Subagent 유형
+
+| 유형 | 설명 | 용도 |
+|------|------|------|
+| **Explore** | 코드베이스 탐색 | 파일 검색, 코드 분석 |
+| **Plan** | 구현 계획 수립 | 아키텍처 설계, 작업 분해 |
+| **general-purpose** | 범용 작업 | 복잡한 멀티스텝 작업 |
+
+> **참고**: Bash 명령어 실행은 별도의 subagent 타입이 아니라, 각 subagent가 사용할 수 있는 **도구(Tool)**입니다.
+
+---
+
+## Subagent 동작 방식
+
+<Mermaid chart={`
+sequenceDiagram
+    participant User as 👤 사용자
+    participant Main as 🤖 Main Agent
+    participant Explore as 🔍 Explore
+    participant General as ⚙️ general-purpose
+
+    User->>Main: "snake.c에서 버그를 찾아서 수정해줘"
+    Main->>Explore: Task: 버그가 있을 만한 코드 탐색
+    Explore-->>Main: 의심 코드 발견 (snake.c:45)
+    Main->>General: Task: 버그 분석 및 수정
+    Note over General: Edit 도구로 코드 수정<br/>Bash 도구로 빌드/테스트
+    General-->>Main: 수정 완료, 테스트 통과
+    Main-->>User: "버그를 수정했습니다"
+`} />
+
+<Placeholder type="video" alt="복잡한 요청이 여러 Subagent로 분배되어 처리되는 과정" />
+
+---
+
+## Subagent 유형별 설명
+
+### Explore Subagent
+
+**코드베이스 탐색**에 특화:
+
+<Source
+  language="text"
+  code={`
+요청: "에러 처리 패턴을 사용하는 함수를 모두 찾아줘"
+
+Explore Subagent 동작:
+1. Grep으로 패턴 검색
+2. 관련 파일 목록 생성
+3. 각 파일의 컨텍스트 분석
+4. 결과 요약 반환
+`}
+/>
+
+### Bash 도구 활용
+
+모든 subagent는 **Bash 도구**를 사용하여 셸 명령어를 실행할 수 있습니다:
+
+<Source
+  language="text"
+  code={`
+요청: "빌드하고 테스트 실행해줘"
+
+general-purpose subagent가 Bash 도구 사용:
+1. make 명령 실행
+2. 빌드 결과 확인
+3. make test 실행
+4. 테스트 결과 분석
+`}
+/>
+
+### Plan Subagent
+
+**구현 계획 수립**에 특화:
+
+<Source
+  language="text"
+  code={`
+요청: "새로운 게임 모드를 추가하려면 어떻게 해야 해?"
+
+Plan Subagent 동작:
+1. 현재 아키텍처 분석
+2. 필요한 변경 사항 파악
+3. 단계별 구현 계획 작성
+4. 리스크 및 주의사항 정리
+`}
+/>
+
+---
+
+## 실습 6-1: Subagent 활용
+
+<Source
+  language="bash"
+  code={`
+claude
+
+> 프로젝트 전체에서 메모리 누수 가능성이 있는 코드를 찾아줘
+`}
+/>
+
+<Placeholder type="image" alt="Explore subagent가 메모리 관련 코드를 탐색하는 결과" />
+
+### 관찰 포인트
+
+1. Agent가 **Explore subagent**를 사용하는지 확인
+2. 검색 결과가 **요약**되어 반환되는지 확인
+3. 후속 작업 제안이 있는지 확인
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#f0fdf4',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **Subagent**는 특정 작업에 특화된 보조 Agent
+2. **Explore**: 코드 탐색, **Plan**: 계획 수립, **general-purpose**: 복합 작업
+3. **Bash**는 subagent가 아닌 **도구(Tool)**
+4. 복잡한 작업은 **여러 Subagent가 협력**하여 수행
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-05-claude-md-및-agent-md-5-2-agent-md-작성--docs"
+  prevTitle="5.2 agent.md 작성"
+  nextLink="?path=/docs/chapters-06-subagent와-agent-skills-6-2-agent-skills--docs"
+  nextTitle="6.2 Agent Skills"
+/>
