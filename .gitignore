@@ -1,0 +1,17 @@
+# Build outputs
+bin/
+*.o
+*.exe
+
+# Libraries (downloaded)
+lib/
+external/
+
+# Temporary files
+tmpclaude-*
+*.tmp
+
+# IDE / Editor
+.vscode/
+*.swp
+*~
