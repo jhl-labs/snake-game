@@ -1,0 +1,110 @@
+name: Build Snake Game
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Cache raylib
+        id: cache-raylib
+        uses: actions/cache@v4
+        with:
+          path: external/raylib
+          key: raylib-windows-${{ hashFiles('.gitmodules') }}
+
+      - name: Build raylib (if not cached)
+        if: steps.cache-raylib.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          cd external/raylib/src
+          make PLATFORM=PLATFORM_DESKTOP CC=gcc
+
+      - name: Create lib directory
+        shell: bash
+        run: mkdir -p lib/mingw
+
+      - name: Copy raylib library
+        shell: bash
+        run: cp external/raylib/src/libraylib.a lib/mingw/
+
+      - name: Build project
+        shell: bash
+        run: make
+
+      - name: Run tests
+        shell: bash
+        run: make test
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-game-windows
+          path: bin/snake.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libgl1-mesa-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxi-dev \
+            libxcursor-dev \
+            libxinerama-dev
+
+      - name: Cache raylib
+        id: cache-raylib
+        uses: actions/cache@v4
+        with:
+          path: external/raylib
+          key: raylib-linux-${{ hashFiles('.gitmodules') }}
+
+      - name: Build raylib (if not cached)
+        if: steps.cache-raylib.outputs.cache-hit != 'true'
+        run: |
+          cd external/raylib/src
+          make PLATFORM=PLATFORM_DESKTOP
+
+      - name: Create lib directory
+        run: mkdir -p lib/linux
+
+      - name: Copy raylib library
+        run: cp external/raylib/src/libraylib.a lib/linux/
+
+      - name: Build project
+        run: make -f Makefile.linux
+
+      - name: Run tests
+        run: make -f Makefile.linux test
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-game-linux
+          path: bin/snake
