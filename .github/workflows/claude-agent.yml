@@ -41,9 +41,17 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # 기능 구현 시 새 브랜치 생성
           branch_prefix: claude/
+          # 디버깅용 전체 출력 활성화
+          show_full_output: true
           # 기본 프롬프트 (CLAUDE.md 참조)
           prompt: |
             프로젝트의 CLAUDE.md 파일을 참고하여 작업하세요.
+
+            ## 중요: 기능 구현 요청 시
+            1. 새 브랜치를 생성하세요 (claude/issue-번호-설명)
+            2. 코드를 작성하고 커밋하세요
+            3. PR을 생성하세요
+            4. Issue에 작업 완료 코멘트를 남기세요
 
             ## 작업 가이드
             - PR 리뷰 요청 시: 코드 품질, 안전성, 아키텍처 검토
