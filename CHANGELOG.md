@@ -30,12 +30,24 @@
   - Logic: `game.c`
   - View: `renderer.c` (raylib 사용)
   - Controller: `main.c`
-- 유닛 테스트 프레임워크 구현
+- 유닛 테스트 프레임워크 구현 (`make test`)
 - GitHub Actions CI/CD 파이프라인
   - Windows/Linux 빌드 자동화
-  - Storybook 문서 자동 배포
+  - GitHub Release 자동 배포
+- `/release` 명령어를 통한 릴리즈 자동화
+- SECURITY.md 보안 정책 문서
 - Storybook 기반 교육 문서 사이트
 - 코딩 스타일 가이드 (CLAUDE.md)
+
+### Fixed
+- MSYS2에 git 패키지 추가
+- `snake_init` 함수에 NULL 포인터 체크 추가
+- Windows 빌드에서 MSYS2 사용하도록 변경
+- GitHub Actions workflow 오류 수정
+
+### Changed
+- `buggy_snake.c`에서 불필요한 주석 제거
+- 미구현 command 파일 정리
 
 ### Technical Details
 - C11 표준 사용
