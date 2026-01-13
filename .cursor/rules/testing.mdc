@@ -1,7 +1,7 @@
 ---
 alwaysApply: false
 description: 테스트 코드 작성 규칙을 정의합니다. 테스트 네이밍, 구조, 커버리지 요구사항을 포함합니다.
-globs: ["test_*.c", "*_test.c"]
+globs: ["test/**/*.c", "test_*.c", "*_test.c"]
 ---
 
 # 테스트 규칙

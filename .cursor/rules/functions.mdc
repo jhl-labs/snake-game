@@ -1,6 +1,7 @@
 ---
-alwaysApply: true
+alwaysApply: false
 description: 함수 설계 원칙과 문서화 규칙을 정의합니다. 함수의 크기, 복잡도, 매개변수 개수 등의 제약사항과 Doxygen 스타일의 주석 작성 방법을 포함합니다.
+globs: ["**/*.c", "**/*.h"]
 ---
 
 # 함수 작성 규칙

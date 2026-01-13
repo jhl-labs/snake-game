@@ -1,6 +1,7 @@
 ---
-alwaysApply: true
+alwaysApply: false
 description: 에러 처리 방법, 상수 정의 규칙, 그리고 디버깅 가이드라인을 정의합니다. 함수의 에러 반환 방식과 assert 사용법을 포함합니다.
+globs: ["src/**/*.c"]
 ---
 
 # 에러 처리 및 디버깅
