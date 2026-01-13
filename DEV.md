@@ -28,8 +28,20 @@ pacman -Su
 
 MSYS2 터미널에서 MinGW 64비트 도구체인 설치:
 
+**필수 패키지:**
+
 ```bash
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-cmake git
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make git unzip curl
+```
+
+**선택 패키지 (개발 도구):**
+
+```bash
+# 코드 포맷팅 (format-code 명령)
+pacman -S mingw-w64-x86_64-clang-tools-extra
+
+# 정적 분석 (analyze 명령)
+pacman -S mingw-w64-x86_64-cppcheck
 ```
 
 ## 2. 환경 변수 설정
@@ -182,3 +194,10 @@ snake-game/
 - **화살표 키**: 뱀 이동
 - **R**: 게임 오버 시 재시작
 - **ESC**: 종료
+
+
+## 9. 기타
+CLOC 사용하기
+```
+C:\msys64\usr\bin\perl.exe C:\msys64\usr\bin\cloc .
+```
