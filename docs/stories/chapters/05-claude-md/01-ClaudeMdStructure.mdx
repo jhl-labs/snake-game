@@ -1,0 +1,185 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+
+<Meta title="Chapters/05. CLAUDE.md 및 agent.md/5.1 CLAUDE.md 구조" />
+
+# Chapter 5: CLAUDE.md 및 agent.md
+
+**예상 소요 시간: 30분**
+
+---
+
+## 5.1 CLAUDE.md 파일
+
+`CLAUDE.md`는 **Claude Code를 위한 프로젝트 가이드** 파일입니다.
+Cursor의 `.cursor/rules/`와 유사한 역할을 합니다.
+
+---
+
+## 파일 위치
+
+**위치:** 프로젝트 루트 (`./CLAUDE.md`)
+
+---
+
+## CLAUDE.md의 역할
+
+| 역할 | 설명 |
+|------|------|
+| **프로젝트 컨텍스트** | 기술 스택, 디렉토리 구조 |
+| **코딩 스타일** | 네이밍, 포매팅 규칙 |
+| **빌드 명령어** | 자주 쓰는 명령어 안내 |
+| **특수 지침** | 프로젝트별 주의사항 |
+
+---
+
+## 구조 예시
+
+<Source
+  language="markdown"
+  code={`
+# Project: Snake Game
+
+## Overview
+raylib을 사용한 C 언어 스네이크 게임 프로젝트입니다.
+
+## Build Commands
+- \`make\` - 프로젝트 빌드
+- \`make clean\` - 빌드 파일 정리
+- \`make run\` - 빌드 후 실행
+
+## Code Style
+- 함수명: snake_case
+- 타입명: PascalCase
+- 상수: UPPER_SNAKE_CASE
+
+## Architecture
+- Model: snake.c, food.c
+- View: renderer.c
+- Controller: main.c
+- Logic: game.c
+
+## Testing
+- 테스트 파일: test_*.c
+- 테스트 실행: make test
+
+## Important Notes
+- raylib 의존성은 Model 계층에서 사용하지 않음
+- 모든 포인터는 NULL 체크 필수
+- 동적 메모리 할당 시 반드시 해제
+`}
+/>
+
+
+---
+
+## 섹션별 설명
+
+### Overview
+
+프로젝트의 **기본 정보**를 제공합니다:
+
+<Source
+  language="markdown"
+  code={`
+## Overview
+- **프로젝트명**: Snake Game
+- **언어**: C (C11 표준)
+- **그래픽 라이브러리**: raylib
+- **빌드 시스템**: Make (MinGW-w64)
+- **플랫폼**: Windows
+`}
+/>
+
+### Build Commands
+
+Agent가 **빌드/실행 명령어**를 알 수 있게 합니다:
+
+<Source
+  language="markdown"
+  code={`
+## Build Commands
+\`\`\`bash
+# 빌드
+make
+
+# 정리
+make clean
+
+# 재빌드
+make clean && make
+
+# 빌드 후 실행
+make && ./bin/snake.exe
+\`\`\`
+`}
+/>
+
+### Architecture
+
+**코드 구조**를 설명합니다:
+
+<Source
+  language="markdown"
+  code={`
+## Architecture (MVC Pattern)
+
+### Model Layer (raylib 의존성 없음)
+- \`snake.c\` / \`snake.h\` - 뱀 데이터 및 조작
+- \`food.c\` / \`food.h\` - 음식 데이터 및 조작
+
+### Logic Layer (raylib 의존성 없음)
+- \`game.c\` / \`game.h\` - 게임 규칙, 충돌 감지
+
+### View Layer (raylib 사용)
+- \`renderer.c\` / \`renderer.h\` - 화면 렌더링
+
+### Controller Layer (raylib 입력 사용)
+- \`main.c\` - 입력 처리, 게임 루프
+`}
+/>
+
+---
+
+## /init으로 자동 생성
+
+Claude Code의 `/init` 명령으로 **자동 생성**할 수 있습니다:
+
+<Source
+  language="bash"
+  code={`
+cd snake-game
+claude
+
+> /init
+`}
+/>
+
+
+Agent가 프로젝트를 분석하여 적절한 CLAUDE.md를 생성합니다.
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ecfdf5',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **CLAUDE.md**는 프로젝트 루트에 위치
+2. **Overview, Build, Style, Architecture** 섹션 포함
+3. `/init` 명령으로 **자동 생성** 가능
+4. Agent가 프로젝트를 이해하는 **핵심 문서**
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-04-command-파일-작성-4-3-커스텀-command-실습--docs"
+  prevTitle="4.3 커스텀 Command 실습"
+  nextLink="?path=/docs/chapters-05-claude-md-및-agent-md-5-2-agent-md-작성--docs"
+  nextTitle="5.2 agent.md 작성"
+/>

@@ -1,6 +1,7 @@
 ---
-alwaysApply: true
+alwaysApply: false
 description: 동적 메모리 할당 및 해제에 대한 규칙과 원칙을 정의합니다. 메모리 누수를 방지하고 안전한 메모리 관리를 위한 가이드라인을 제공합니다.
+globs: ["src/**/*.c"]
 ---
 
 # 메모리 관리

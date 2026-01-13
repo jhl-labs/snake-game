@@ -1,6 +1,7 @@
 ---
-alwaysApply: true
+alwaysApply: false
 description: raylib 라이브러리 사용 규칙과 계층 분리 원칙을 정의합니다. raylib은 뷰 계층에서만 사용하며, 모델과 로직 계층과의 의존성을 분리합니다.
+globs: ["**/renderer.c", "**/main.c"]
 ---
 
 # raylib 사용 규칙

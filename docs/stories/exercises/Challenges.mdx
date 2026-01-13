@@ -1,0 +1,159 @@
+import { Meta, Source } from '@storybook/blocks';
+import { ExerciseCard } from '../../components/ExerciseCard';
+
+<Meta title="Exercises/도전 과제" />
+
+# 도전 과제
+
+추가 실습을 위한 도전 과제입니다.
+
+---
+
+## 초급 도전
+
+<ExerciseCard
+  number={1}
+  title="점수 시스템 추가"
+  difficulty="초급"
+  description="음식을 먹을 때마다 점수가 증가하는 시스템을 구현합니다."
+  hint="Game 구조체에 score 필드를 추가하세요"
+/>
+
+### 요청 예시
+
+<Source
+  language="text"
+  code={`
+> 게임에 점수 시스템을 추가해줘.
+> 음식을 먹으면 10점씩 증가하고,
+> 현재 점수를 화면에 표시해줘.
+`}
+/>
+
+---
+
+<ExerciseCard
+  number={2}
+  title="게임 재시작 기능"
+  difficulty="초급"
+  description="게임 오버 후 R 키를 누르면 재시작되는 기능을 구현합니다."
+  hint="game_reset 함수를 만들고 main.c에서 호출하세요"
+/>
+
+### 요청 예시
+
+<Source
+  language="text"
+  code={`
+> 게임 오버 상태에서 R 키를 누르면
+> 게임이 처음부터 다시 시작되도록 해줘.
+`}
+/>
+
+---
+
+## 중급 도전
+
+<ExerciseCard
+  number={3}
+  title="난이도 시스템"
+  difficulty="중급"
+  description="뱀 길이에 따라 게임 속도가 빨라지는 난이도 시스템을 구현합니다."
+  hint="뱀 길이와 게임 속도의 관계를 정의하세요"
+/>
+
+### 요청 예시
+
+<Source
+  language="text"
+  code={`
+> 뱀 길이에 따라 게임 속도가 증가하는 난이도 시스템을 만들어줘.
+>
+> - 길이 1-5: 기본 속도
+> - 길이 6-10: 1.2배
+> - 길이 11+: 1.5배
+`}
+/>
+
+---
+
+<ExerciseCard
+  number={4}
+  title="장애물 추가"
+  difficulty="중급"
+  description="맵에 고정 장애물을 배치하여 난이도를 높입니다."
+  hint="Obstacle 구조체와 충돌 감지를 추가하세요"
+/>
+
+---
+
+<ExerciseCard
+  number={5}
+  title="사운드 효과"
+  difficulty="중급"
+  description="음식 섭취, 게임 오버 시 사운드를 재생합니다."
+  hint="raylib의 Sound 관련 함수를 사용하세요"
+/>
+
+---
+
+## 고급 도전
+
+<ExerciseCard
+  number={6}
+  title="2인용 모드"
+  difficulty="고급"
+  description="두 명이 동시에 플레이할 수 있는 모드를 구현합니다."
+  hint="Snake 배열과 키 매핑을 분리하세요"
+/>
+
+### 요청 예시
+
+<Source
+  language="text"
+  code={`
+> 2인용 모드를 추가해줘.
+>
+> 플레이어 1: 방향키 (위/아래/좌/우)
+> 플레이어 2: WASD 키
+>
+> 각자 음식을 먹으면 점수 증가,
+> 서로 충돌하면 게임 오버.
+`}
+/>
+
+---
+
+<ExerciseCard
+  number={7}
+  title="리플레이 시스템"
+  difficulty="고급"
+  description="게임 플레이를 저장하고 다시 재생할 수 있는 기능입니다."
+  hint="각 프레임의 입력을 기록하고 재생하세요"
+/>
+
+---
+
+<ExerciseCard
+  number={8}
+  title="AI 뱀"
+  difficulty="고급"
+  description="음식을 향해 자동으로 이동하는 AI 뱀을 구현합니다."
+  hint="A* 또는 간단한 경로 찾기 알고리즘을 사용하세요"
+/>
+
+---
+
+## 도전 과제 진행 팁
+
+1. **단계별 접근**: 큰 기능을 작은 단계로 나누세요
+2. **테스트 작성**: 기능 구현 전에 테스트 케이스를 먼저 작성하세요
+3. **Agent 활용**: 막힐 때 Agent에게 힌트를 요청하세요
+
+<Source
+  language="text"
+  code={`
+> [기능]을 구현하려는데 어떻게 시작하면 좋을까?
+> 단계별로 알려줘.
+`}
+/>

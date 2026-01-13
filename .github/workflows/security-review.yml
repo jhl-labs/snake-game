@@ -1,0 +1,68 @@
+name: Security Review
+
+on:
+  pull_request:
+    paths:
+      - 'src/**/*.c'
+      - 'include/**/*.h'
+      - 'test/**/*.c'
+      - 'tests/**/*.c'
+
+jobs:
+  security-review:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Security Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          # MAX 플랜 사용자: CLAUDE_CODE_OAUTH_TOKEN 사용
+          # API 사용자: ANTHROPIC_API_KEY 사용
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            보안 관점에서 이 PR의 C 코드를 분석해주세요.
+
+            ## 검사 항목
+
+            ### 메모리 안전성
+            - 버퍼 오버플로우 가능성
+            - 스택 오버플로우 위험
+            - 힙 오버플로우 위험
+            - Use-after-free 버그
+            - Double-free 버그
+            - 메모리 누수
+
+            ### 포인터 안전성
+            - NULL 포인터 역참조
+            - 와일드 포인터 사용
+            - 댕글링 포인터
+
+            ### 입력 검증
+            - 배열 인덱스 검증
+            - 정수 오버플로우
+            - 부호 있는/없는 정수 혼용
+
+            ### 기타
+            - 초기화되지 않은 변수 사용
+            - 정의되지 않은 동작 (UB)
+
+            ## 출력 형식
+            발견된 각 이슈에 대해:
+            1. 파일명과 라인 번호
+            2. 위험도 (Critical/High/Medium/Low)
+            3. 문제 설명
+            4. 수정 제안
+
+            한국어로 작성해주세요.
+          timeout_minutes: 15

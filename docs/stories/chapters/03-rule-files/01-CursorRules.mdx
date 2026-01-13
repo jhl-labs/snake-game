@@ -1,0 +1,239 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+
+<Meta title="Chapters/03. Rule 파일 작성/3.1 Cursor Rule 파일" />
+
+# Chapter 3: Rule 파일 작성
+
+**예상 소요 시간: 45분**
+
+---
+
+## 3.1 Cursor Rule 파일
+
+Rule 파일은 Agent에게 **프로젝트별 지침**을 제공합니다.
+코딩 스타일, 아키텍처 규칙, 금지 사항 등을 정의할 수 있습니다.
+
+---
+
+## 파일 위치 및 구조
+
+Cursor는 두 가지 Rule 파일 형식을 지원합니다:
+
+### 새 형식 (권장)
+
+**위치:** `.cursor/rules/rule-name/RULE.md`
+
+각 규칙을 별도의 폴더로 관리하며, 폴더 안에 `RULE.md` 파일을 생성합니다.
+
+```
+.cursor/rules/
+├── coding-style/
+│   └── RULE.md
+├── architecture/
+│   └── RULE.md
+└── testing/
+    └── RULE.md
+```
+
+### 레거시 형식 (이전 버전 호환)
+
+**위치:** `.cursor/rules/*.mdc`
+
+단일 파일로 규칙을 정의하는 기존 방식입니다. 계속 작동하지만 새 프로젝트에서는 새 형식을 권장합니다.
+
+
+### 기본 구조
+
+<Source
+  language="markdown"
+  code={`
+---
+alwaysApply: true
+description: 이 규칙의 설명
+---
+
+# 규칙 제목
+
+## 섹션 1
+- 규칙 내용
+
+## 섹션 2
+- 규칙 내용
+`}
+/>
+
+---
+
+## 실제 Rule 파일 분석
+
+### coding-style/RULE.md
+
+프로젝트의 실제 Rule 파일을 살펴보겠습니다 (새 형식 기준):
+
+<Source
+  language="markdown"
+  code={`
+---
+alwaysApply: true
+description: 코드 작성 시 따라야 할 네이밍 규칙, 포매팅, 주석 스타일을 정의합니다.
+---
+
+# 코딩 스타일 가이드
+
+## 네이밍 규칙
+
+| 대상 | 규칙 | 예시 |
+|------|------|------|
+| 함수명 | snake_case | \`snake_move()\`, \`game_update()\` |
+| 타입/구조체 | PascalCase | \`Snake\`, \`GameState\` |
+| 상수 | UPPER_SNAKE_CASE | \`GRID_WIDTH\`, \`MAX_SNAKE_LENGTH\` |
+| 전역 변수 | g_ 접두사 | \`g_game_state\` |
+| 포인터 변수 | p_ 접두사 | \`p_snake\` |
+
+## 함수 주석 스타일
+
+\`\`\`c
+/**
+ * 뱀을 지정된 방향으로 이동시킵니다.
+ *
+ * @param p_snake 뱀 객체 포인터
+ * @param direction 이동 방향
+ * @return 이동 성공 여부
+ */
+bool snake_move(Snake* p_snake, Direction direction);
+\`\`\`
+`}
+/>
+
+
+### architecture/RULE.md
+
+<Source
+  language="markdown"
+  code={`
+---
+alwaysApply: true
+description: MVC 아키텍처 원칙과 계층 분리 규칙을 정의합니다.
+---
+
+# 아키텍처 가이드
+
+## 계층 구조
+
+\`\`\`
+┌─────────────────────────────────────┐
+│           main.c (Controller)       │ ← raylib 입력 처리
+├─────────────────────────────────────┤
+│           renderer.c (View)         │ ← raylib 렌더링
+├─────────────────────────────────────┤
+│           game.c (Logic)            │ ← raylib 의존성 없음
+├─────────────────────────────────────┤
+│      snake.c / food.c (Model)       │ ← raylib 의존성 없음
+└─────────────────────────────────────┘
+\`\`\`
+
+## 의존성 규칙
+
+- Model → 외부 라이브러리 의존 금지
+- Logic → raylib 의존 금지
+- View → raylib 사용 허용
+- Controller → 모든 계층 접근 가능
+`}
+/>
+
+---
+
+## Rule이 Agent에 미치는 영향
+
+### Rule 적용 전
+
+<Source
+  language="text"
+  code={`
+> 뱀 길이를 늘리는 함수를 만들어줘
+
+// Agent가 생성한 코드 (일관성 없음)
+void GrowSnake(struct snake* s) {
+    s->len++;
+}
+`}
+/>
+
+### Rule 적용 후
+
+<Source
+  language="text"
+  code={`
+> 뱀 길이를 늘리는 함수를 만들어줘
+
+// Agent가 Rule을 따라 생성한 코드
+/**
+ * 뱀의 길이를 1 증가시킵니다.
+ *
+ * @param p_snake 뱀 객체 포인터
+ * @return 성공 여부
+ */
+bool snake_grow(Snake* p_snake) {
+    if (p_snake == NULL) {
+        return false;
+    }
+    p_snake->length++;
+    return true;
+}
+`}
+/>
+
+
+---
+
+## 프로젝트의 Rule 파일 목록
+
+현재 프로젝트는 **두 형식을 혼합**하여 사용합니다:
+
+### 새 형식 (폴더/RULE.md)
+
+| 폴더명 | 설명 |
+|--------|------|
+| `coding-style/RULE.md` | 네이밍, 포매팅, 주석 스타일 |
+| `architecture/RULE.md` | MVC 계층 분리 규칙 |
+| `testing/RULE.md` | 테스트 작성 규칙 |
+
+### 레거시 형식 (.mdc)
+
+| 파일명 | 설명 |
+|--------|------|
+| `constraints.mdc` | 제약 사항 |
+| `documentation.mdc` | 문서화 규칙 |
+| `error-handling.mdc` | 에러 처리 패턴 |
+| `functions.mdc` | 함수 작성 규칙 |
+| `memory-management.mdc` | 메모리 관리 규칙 |
+| `raylib.mdc` | raylib 사용 규칙 |
+
+> **참고**: 두 형식 모두 Cursor에서 동일하게 작동합니다.
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. Rule 파일 위치: **`.cursor/rules/rule-name/RULE.md`** (권장) 또는 **`.cursor/rules/*.mdc`** (레거시)
+2. YAML 프론트매터로 **메타데이터** 정의
+3. 마크다운으로 **규칙 내용** 작성
+4. Rule을 통해 **일관된 코드 스타일** 유지
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-02-agent-기본-개념-2-3-컨텍스트의-중요성--docs"
+  prevTitle="2.3 컨텍스트의 중요성"
+  nextLink="?path=/docs/chapters-03-rule-파일-작성-3-2-rule-메타데이터--docs"
+  nextTitle="3.2 Rule 메타데이터"
+/>

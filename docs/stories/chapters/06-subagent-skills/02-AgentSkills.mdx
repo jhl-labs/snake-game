@@ -1,0 +1,248 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/06. Subagent와 Agent Skills/6.2 Agent Skills" />
+
+# 6.2 Agent Skills
+
+Skills는 Agent가 **특정 작업을 수행하는 능력**입니다.
+Claude Code는 `.claude/skills/` 폴더에서 커스텀 스킬을 정의할 수 있습니다.
+
+---
+
+## 주요 Skills
+
+| 스킬 | 설명 | 활용 예 |
+|------|------|--------|
+| **코드 리뷰** | 코드 품질 분석 | PR 리뷰, 코드 검토 |
+| **버그 수정** | 문제 식별 및 해결 | 에러 분석, 패치 |
+| **리팩토링** | 코드 구조 개선 | 중복 제거, 모듈화 |
+| **테스트 작성** | 유닛 테스트 생성 | TC 자동 생성 |
+| **문서화** | 주석 및 문서 작성 | API 문서, README |
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Skills["🎯 Agent Skills"]
+        direction TB
+        Review["🔍 코드 리뷰<br/>품질 분석"]
+        Bug["🐛 버그 수정<br/>문제 해결"]
+        Refactor["♻️ 리팩토링<br/>구조 개선"]
+        Test["🧪 테스트 작성<br/>TC 생성"]
+        Doc["📝 문서화<br/>주석/문서"]
+    end
+
+    Request["요청"] --> Skills
+    Skills --> Output["결과물"]
+`} />
+
+---
+
+## Skills 파일 구조
+
+**위치:** `.claude/skills/[skill-name]/SKILL.md`
+
+### 예시: code-review 스킬
+
+<Source
+  language="markdown"
+  code={`
+# Code Review Skill
+
+## 목적
+코드 변경 사항을 분석하고 품질 피드백을 제공합니다.
+
+## 검토 항목
+
+### 1. 코딩 스타일
+- 네이밍 규칙 준수
+- 포매팅 일관성
+- 주석 품질
+
+### 2. 버그 가능성
+- NULL 포인터 체크
+- 배열 경계 검사
+- 메모리 누수
+
+### 3. 성능
+- 불필요한 반복
+- 비효율적인 알고리즘
+- 메모리 사용량
+
+### 4. 보안
+- 입력 검증
+- 버퍼 오버플로우
+- 하드코딩된 값
+
+## 출력 형식
+- 심각도: Critical / Warning / Info
+- 위치: 파일:라인
+- 설명: 문제점과 해결책
+`}
+/>
+
+---
+
+## 프로젝트의 Skills
+
+### code-review
+
+<Source
+  language="text"
+  code={`
+.claude/skills/code-review/SKILL.md
+
+역할: 코드 품질 분석
+- 스타일 검사
+- 버그 가능성 체크
+- 성능/보안 리뷰
+`}
+/>
+
+### bug-fix
+
+<Source
+  language="text"
+  code={`
+.claude/skills/bug-fix/SKILL.md
+
+역할: 버그 분석 및 수정
+- 에러 메시지 분석
+- 원인 추적
+- 수정 및 검증
+`}
+/>
+
+### test-generation
+
+<Source
+  language="text"
+  code={`
+.claude/skills/test-generation/SKILL.md
+
+역할: 테스트 코드 생성
+- 함수 분석
+- TC 설계
+- 코드 생성
+`}
+/>
+
+<Mermaid chart={`
+flowchart TB
+    subgraph Claude[".claude/"]
+        subgraph Skills["skills/"]
+            CR["code-review/"]
+            BF["bug-fix/"]
+            TG["test-generation/"]
+        end
+    end
+
+    CR --> CR_SKILL["SKILL.md<br/>코드 품질 분석"]
+    BF --> BF_SKILL["SKILL.md<br/>버그 분석 및 수정"]
+    TG --> TG_SKILL["SKILL.md<br/>테스트 코드 생성"]
+`} />
+
+---
+
+## Skills 활용 예시
+
+### 코드 리뷰 요청
+
+<Source
+  language="text"
+  code={`
+> snake.c의 최근 변경 사항을 리뷰해줘
+
+Agent (code-review skill 활용):
+"코드 리뷰 결과입니다:
+
+[Warning] snake.c:45
+- NULL 체크 누락
+- 권장: if (p_snake == NULL) return false;
+
+[Info] snake.c:52
+- 매직 넘버 사용
+- 권장: #define MAX_SPEED 10 사용"
+`}
+/>
+
+### 테스트 생성 요청
+
+<Source
+  language="text"
+  code={`
+> snake_move 함수의 테스트를 작성해줘
+
+Agent (test-generation skill 활용):
+"다음 테스트 케이스를 생성했습니다:
+
+1. test_snake_move_up - 위로 이동
+2. test_snake_move_boundary - 경계 조건
+3. test_snake_move_null - NULL 입력"
+`}
+/>
+
+<Placeholder type="video" alt="Agent가 Skills를 활용하여 코드 리뷰를 수행하는 과정" />
+
+---
+
+## 커스텀 Skill 만들기
+
+### 새 Skill 추가
+
+<Source
+  language="bash"
+  code={`
+# 폴더 생성
+mkdir -p .claude/skills/performance-check
+
+# SKILL.md 작성
+`}
+/>
+
+<Source
+  language="markdown"
+  code={`
+# Performance Check Skill
+
+## 목적
+코드의 성능 문제를 분석합니다.
+
+## 검사 항목
+1. 시간 복잡도 분석
+2. 메모리 사용량
+3. 불필요한 반복
+4. 캐싱 가능 연산
+
+## 보고 형식
+- 위치
+- 현재 복잡도
+- 개선 방안
+`}
+/>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ede9fe',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **Skills**는 특정 작업에 대한 전문 능력
+2. `.claude/skills/` 폴더에 **SKILL.md**로 정의
+3. **code-review, bug-fix, test-generation** 등 제공
+4. **커스텀 Skill**을 추가하여 확장 가능
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-06-subagent와-agent-skills-6-1-subagent-개념--docs"
+  prevTitle="6.1 Subagent 개념"
+  nextLink="?path=/docs/chapters-06-subagent와-agent-skills-6-3-background-agent--docs"
+  nextTitle="6.3 Background Agent"
+/>

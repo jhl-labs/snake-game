@@ -1,0 +1,231 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/02. Agent 기본 개념/2.2 Agent 도구" />
+
+# 2.2 Agent가 사용하는 도구들
+
+Agent는 다양한 **도구(Tools)**를 사용하여 실제 작업을 수행합니다.
+
+---
+
+## 핵심 도구 카테고리
+
+<Mermaid chart={`
+flowchart TB
+    subgraph FileTools["📁 파일 도구"]
+        Read["Read<br/>파일 읽기"]
+        Write["Write<br/>파일 생성"]
+        Edit["Edit<br/>파일 수정"]
+    end
+
+    subgraph SearchTools["🔍 검색 도구"]
+        Grep["Grep/Search<br/>코드 검색"]
+        Glob["Glob/Files<br/>파일 검색"]
+    end
+
+    subgraph ExecTools["⚡ 실행 도구"]
+        Bash["Bash/Terminal<br/>명령 실행"]
+        Web["WebSearch<br/>인터넷 검색"]
+    end
+
+    Request["사용자 요청"] --> Agent["🤖 Agent"]
+    Agent --> FileTools
+    Agent --> SearchTools
+    Agent --> ExecTools
+    FileTools & SearchTools & ExecTools --> Result["작업 완료"]
+`} />
+
+---
+
+## 도구 목록
+
+### 파일 관련 도구
+
+| 도구 | Cursor | Claude Code | 설명 |
+|------|--------|-------------|------|
+| **Read** | Read | Read | 파일 내용 읽기 |
+| **Write** | Write | Write | 새 파일 생성 |
+| **Edit** | Edit | Edit | 기존 파일 수정 |
+
+### 검색 도구
+
+| 도구 | Cursor | Claude Code | 설명 |
+|------|--------|-------------|------|
+| **Search** | Search | Grep | 코드 내용 검색 |
+| **Files** | Files | Glob | 파일명 패턴 검색 |
+
+### 실행 도구
+
+| 도구 | Cursor | Claude Code | 설명 |
+|------|--------|-------------|------|
+| **Terminal** | Terminal | Bash | 셸 명령어 실행 |
+| **Web** | Web | WebSearch | 인터넷 검색 |
+
+---
+
+## 도구별 상세 설명
+
+### Read - 파일 읽기
+
+<Source
+  language="text"
+  code={`
+요청: "snake.c 파일을 읽어줘"
+
+내부 동작:
+Read(file_path="src/snake.c")
+→ 파일 전체 내용 반환
+`}
+/>
+
+**옵션:**
+- `offset`: 시작 라인 지정
+- `limit`: 읽을 라인 수 제한
+
+### Grep - 코드 검색
+
+<Source
+  language="text"
+  code={`
+요청: "snake_move 함수를 찾아줘"
+
+내부 동작:
+Grep(pattern="snake_move", path="src/")
+→ 매칭되는 파일과 라인 반환
+`}
+/>
+
+**옵션:**
+- `pattern`: 검색 패턴 (정규식 지원)
+- `glob`: 파일 필터 (예: `*.c`)
+- `-C`: 컨텍스트 라인 수
+
+### Edit - 파일 수정
+
+<Source
+  language="text"
+  code={`
+요청: "snake_init 함수에 NULL 체크 추가해줘"
+
+내부 동작:
+Edit(
+  file_path="src/snake.c",
+  old_string="void snake_init(Snake* p_snake) {",
+  new_string="void snake_init(Snake* p_snake) {\\n    if (p_snake == NULL) return;"
+)
+`}
+/>
+
+**특징:**
+- `old_string`과 `new_string`을 교체
+- 문자열이 **유일해야** 동작
+
+### Bash - 명령어 실행
+
+<Source
+  language="text"
+  code={`
+요청: "프로젝트를 빌드해줘"
+
+내부 동작:
+Bash(command="make")
+→ 빌드 결과 (stdout, stderr) 반환
+`}
+/>
+
+---
+
+## 도구 사용 패턴
+
+### 패턴 1: 탐색 → 수정
+
+<Mermaid chart={`
+flowchart LR
+    A["🔍 Grep/Glob<br/>대상 찾기"] --> B["📖 Read<br/>현재 상태 확인"]
+    B --> C["✏️ Edit<br/>수정"]
+    C --> D["📖 Read<br/>결과 검증"]
+`} />
+
+### 패턴 2: 생성 → 검증
+
+<Mermaid chart={`
+flowchart LR
+    A["📝 Write<br/>파일 생성"] --> B["⚡ Bash<br/>빌드/테스트"]
+    B --> C{성공?}
+    C -->|실패| D["✏️ Edit<br/>수정"]
+    D --> B
+    C -->|성공| E["✅ 완료"]
+`} />
+
+---
+
+## 실습 2-1: 도구 동작 관찰
+
+### Claude Code에서
+
+verbose 모드로 실행하여 도구 호출을 관찰해보세요:
+
+<Source
+  language="bash"
+  code={`
+claude --verbose
+
+> snake.c 파일에서 뱀이 이동하는 함수를 찾아줘
+`}
+/>
+
+### Cursor에서
+
+Agent 패널에서 도구 사용 과정이 실시간으로 표시됩니다:
+
+<Source
+  language="text"
+  code={`
+# Cmd + I로 Agent 열기
+snake.c 파일에서 뱀이 이동하는 함수를 찾아줘
+
+# Agent가 사용하는 도구 확인:
+# - Search: snake_move 검색
+# - Read: src/snake.c 파일 읽기
+`}
+/>
+
+### 관찰 포인트
+
+1. **어떤 도구를 사용하는가?**
+   - Grep으로 검색 → Read로 상세 확인
+
+2. **어떤 순서로 실행하는가?**
+   - 검색 → 읽기 → 분석
+
+3. **결과를 어떻게 해석하는가?**
+   - 코드 분석 후 자연어로 설명
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. Agent는 **Read, Write, Edit, Grep, Bash** 등의 도구 사용
+2. 각 도구는 **특정 작업에 특화**
+3. 복잡한 요청은 **여러 도구를 조합**하여 처리
+4. **Cursor**: Agent 패널에서 도구 사용 실시간 표시
+5. **Claude Code**: `--verbose`로 도구 호출 과정 확인
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-02-agent-기본-개념-2-1-agent-동작-원리--docs"
+  prevTitle="2.1 Agent 동작 원리"
+  nextLink="?path=/docs/chapters-02-agent-기본-개념-2-3-컨텍스트의-중요성--docs"
+  nextTitle="2.3 컨텍스트의 중요성"
+/>

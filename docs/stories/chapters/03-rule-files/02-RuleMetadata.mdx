@@ -1,0 +1,225 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+
+<Meta title="Chapters/03. Rule 파일 작성/3.2 Rule 메타데이터" />
+
+# 3.2 Rule 메타데이터
+
+Rule 파일의 **YAML 프론트매터**는 Rule의 적용 조건을 제어합니다.
+
+---
+
+## 메타데이터 필드
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `alwaysApply` | boolean | 항상 적용 여부 |
+| `description` | string | 규칙 설명 (Agent에게 힌트) |
+| `globs` | string[] | 적용 파일 패턴 |
+
+---
+
+## alwaysApply
+
+### true - 항상 적용
+
+<Source
+  language="yaml"
+  code={`
+---
+alwaysApply: true
+description: 모든 코드에 적용되는 기본 스타일
+---
+`}
+/>
+
+**사용 예:**
+- 코딩 스타일
+- 아키텍처 규칙
+- 보안 지침
+
+### false - 조건부 적용
+
+<Source
+  language="yaml"
+  code={`
+---
+alwaysApply: false
+description: 테스트 파일에만 적용되는 규칙
+globs: ["test_*.c", "*_test.c"]
+---
+`}
+/>
+
+**사용 예:**
+- 테스트 전용 규칙
+- 특정 모듈 규칙
+- 특수 파일 형식 규칙
+
+---
+
+## globs - 파일 패턴 필터
+
+`alwaysApply: false`일 때, **특정 파일에만** Rule을 적용합니다.
+
+### 패턴 문법
+
+| 패턴 | 의미 | 예시 |
+|------|------|------|
+| `*` | 모든 문자 (경로 제외) | `*.c` → 모든 .c 파일 |
+| `**` | 모든 경로 포함 | `src/**/*.c` → src 하위 모든 .c |
+| `?` | 단일 문자 | `test_?.c` → test_1.c, test_a.c |
+| `[]` | 문자 집합 | `*.[ch]` → .c 또는 .h 파일 |
+
+### 실용적인 예시
+
+<Source
+  language="yaml"
+  code={`
+# 테스트 파일만
+globs: ["test_*.c", "*_test.c", "tests/**/*.c"]
+
+# 헤더 파일만
+globs: ["include/**/*.h", "*.h"]
+
+# 소스 파일만
+globs: ["src/**/*.c"]
+
+# 특정 모듈
+globs: ["src/snake.*", "include/snake.h"]
+`}
+/>
+
+---
+
+## description의 역할
+
+`description`은 **Agent에게 힌트**를 제공합니다.
+Agent가 규칙을 적용할지 판단할 때 참고합니다.
+
+### 좋은 description
+
+<Source
+  language="yaml"
+  code={`
+description: 테스트 코드 작성 시 AAA 패턴과 assert 매크로 사용 규칙
+`}
+/>
+
+### 나쁜 description
+
+<Source
+  language="yaml"
+  code={`
+description: 테스트 규칙
+`}
+/>
+
+---
+
+## 실습 3-1: 새로운 Rule 파일 생성
+
+테스트 관련 규칙을 정의하는 새 Rule 파일을 생성해보세요.
+
+### 요청
+
+<Source
+  language="text"
+  code={`
+# Cursor Chat에서
+.cursor/rules/testing/RULE.md 파일을 생성해줘.
+
+다음 내용을 포함해야 해:
+- 테스트 함수는 test_ 접두사
+- AAA 패턴 사용 (Arrange-Act-Assert)
+- 테스트 파일에만 적용되도록 globs 설정
+`}
+/>
+
+### 예상 결과
+
+<Source
+  language="markdown"
+  code={`
+---
+alwaysApply: false
+description: 테스트 코드 작성 시 따라야 할 규칙을 정의합니다.
+globs: ["test_*.c", "*_test.c", "tests/**/*.c"]
+---
+
+# 테스트 규칙
+
+## 테스트 함수 네이밍
+
+- \`test_\` 접두사 사용
+- 테스트 대상 함수명 포함
+- 테스트 시나리오 설명
+
+예시:
+- \`test_snake_move_up()\` - 뱀이 위로 이동하는지 테스트
+- \`test_snake_collision_wall()\` - 벽 충돌 테스트
+
+## 테스트 구조 (AAA 패턴)
+
+\`\`\`c
+void test_function_name(void) {
+    // Arrange - 준비
+    Snake snake;
+    snake_init(&snake, 5, 5);
+
+    // Act - 실행
+    snake_move(&snake, DIRECTION_UP);
+
+    // Assert - 검증
+    assert(snake.head_y == 4);
+}
+\`\`\`
+`}
+/>
+
+
+---
+
+## Rule 적용 확인 방법
+
+새 Rule이 적용되는지 확인하려면:
+
+<Source
+  language="text"
+  code={`
+# Cursor Chat에서
+test_snake.c 파일에 snake_move 함수 테스트를 작성해줘
+`}
+/>
+
+Agent가 **testing/RULE.md 규칙을 따르는지** 확인:
+- `test_` 접두사 사용 여부
+- AAA 패턴 적용 여부
+- 주석 스타일
+
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ecfdf5',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **alwaysApply**: true면 항상, false면 조건부 적용
+2. **globs**: 파일 패턴으로 적용 범위 제한
+3. **description**: Agent에게 규칙 힌트 제공
+4. 목적에 맞게 **조합하여 사용**
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-03-rule-파일-작성-3-1-cursor-rule-파일--docs"
+  prevTitle="3.1 Cursor Rule 파일"
+  nextLink="?path=/docs/chapters-03-rule-파일-작성-3-3-효과적인-rule-작성--docs"
+  nextTitle="3.3 효과적인 Rule 작성"
+/>

@@ -1,0 +1,56 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  claude-review:
+    # PR 이벤트이거나, 코멘트에 @claude가 포함된 경우에만 실행
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          # MAX 플랜 사용자: CLAUDE_CODE_OAUTH_TOKEN 사용
+          # API 사용자: ANTHROPIC_API_KEY 사용
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            이 PR을 리뷰해주세요. 다음 사항을 확인해주세요:
+
+            ## 코드 품질
+            - 코딩 스타일 준수 여부 (snake_case 함수명, PascalCase 타입명)
+            - 함수 길이 (50줄 이내 권장)
+            - 매개변수 개수 (4개 이하 권장)
+
+            ## 안전성
+            - NULL 포인터 체크
+            - 메모리 할당/해제 균형
+            - 배열 경계 체크
+
+            ## 아키텍처
+            - MVC 패턴 준수 (raylib은 renderer.c, main.c에서만 사용)
+            - 모듈 간 의존성
+
+            한국어로 리뷰해주세요.
+          timeout_minutes: 10

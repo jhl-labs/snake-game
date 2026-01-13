@@ -12,6 +12,7 @@ SRC_DIR = src
 INCLUDE_DIR = include
 LIB_DIR = lib-linux
 BIN_DIR = bin
+TEST_DIR = tests
 
 # 소스 파일
 SOURCES = $(SRC_DIR)/main.c \
@@ -25,6 +26,7 @@ OBJECTS = $(SOURCES:.c=.o)
 
 # 실행 파일
 TARGET = $(BIN_DIR)/snake
+TEST_TARGET = $(BIN_DIR)/test_snake
 
 # 기본 타겟
 all: $(TARGET)
@@ -53,4 +55,11 @@ rebuild: clean all
 run: $(TARGET)
 	./$(TARGET)
 
-.PHONY: all clean rebuild run
+# 테스트 빌드 및 실행
+test: $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+$(TEST_TARGET): $(TEST_DIR)/test_snake.c $(SRC_DIR)/snake.c | $(BIN_DIR)
+	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@
+
+.PHONY: all clean rebuild run test

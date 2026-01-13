@@ -1,0 +1,230 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/07. Test Case 작성 실습/7.1 Agent로 TC 작성" />
+
+# Chapter 7: Test Case 작성 실습
+
+**예상 소요 시간: 30분**
+
+---
+
+## 7.1 Agent를 활용한 TC 작성
+
+Agent에게 테스트 케이스를 요청하면 **자동으로 TC를 생성**합니다.
+효과적인 요청 방법을 알아봅니다.
+
+---
+
+## TC 작성 요청의 기본 요소
+
+Agent에게 TC를 요청할 때 포함해야 할 정보:
+
+| 요소 | 설명 | 예시 |
+|------|------|------|
+| **대상 함수** | 테스트할 함수 | `snake_move()` |
+| **파일 위치** | 함수가 있는 파일 | `src/snake.c` |
+| **시나리오** | 테스트하려는 상황 | 정상 이동, 벽 충돌 |
+| **기대 결과** | 예상되는 동작 | 위치 변경, 게임 오버 |
+
+---
+
+## AAA 패턴
+
+테스트 코드의 표준 구조:
+
+<Mermaid chart={`
+flowchart LR
+    subgraph AAA["AAA 패턴"]
+        A["🔧 Arrange<br/>준비<br/>테스트 데이터 설정"]
+        B["▶️ Act<br/>실행<br/>테스트 대상 호출"]
+        C["✅ Assert<br/>검증<br/>결과 확인"]
+    end
+
+    A --> B --> C
+`} />
+
+<Source
+  language="c"
+  code={`
+void test_snake_move_up(void) {
+    // Arrange - 준비
+    Snake snake;
+    snake_init(&snake, 5, 5);
+
+    // Act - 실행
+    snake_move(&snake, DIRECTION_UP);
+
+    // Assert - 검증
+    assert(snake.body[0].y == 4);
+}
+`}
+/>
+
+---
+
+## 효과적인 TC 요청
+
+### 나쁜 요청
+
+<Source
+  language="text"
+  code={`
+> 테스트 만들어줘
+`}
+/>
+
+**문제점:**
+- 어떤 함수?
+- 어떤 시나리오?
+- 어떤 형식?
+
+### 좋은 요청
+
+<Source
+  language="text"
+  code={`
+> snake_move 함수에 대한 유닛 테스트를 작성해줘.
+>
+> 조건:
+> - AAA 패턴 (Arrange-Act-Assert) 사용
+> - 각 방향별 이동 테스트 (상하좌우)
+> - 벽 충돌 시 게임 오버 확인
+> - assert 매크로 사용
+> - 파일 위치: tests/test_snake.c
+`}
+/>
+
+<Placeholder type="video" alt="좋은 요청으로 테스트가 생성되는 과정" />
+
+---
+
+## 요청 템플릿
+
+<Source
+  language="text"
+  code={`
+다음 함수에 대한 테스트 케이스를 작성해줘:
+
+- 함수: [함수명]
+- 파일: [파일 경로]
+- 테스트 시나리오:
+  1. [시나리오 1]
+  2. [시나리오 2]
+  3. [시나리오 3]
+- 사용할 패턴: AAA (Arrange-Act-Assert)
+- 검증 방법: assert 매크로
+`}
+/>
+
+---
+
+## Agent의 TC 생성 과정
+
+<Mermaid chart={`
+sequenceDiagram
+    participant User as 👤 사용자
+    participant Agent as 🤖 Agent
+    participant Read as 📖 Read
+    participant Write as 📝 Write
+
+    User->>Agent: snake_move 테스트 작성해줘
+
+    Note over Agent: 대상 함수 분석 필요
+    Agent->>Read: snake.h 읽기
+    Read-->>Agent: 함수 시그니처 확인
+
+    Agent->>Read: snake.c 읽기
+    Read-->>Agent: 구현 로직 확인
+
+    Note over Agent: TC 설계<br/>- 정상 케이스<br/>- 경계 케이스<br/>- 에러 케이스
+
+    Agent->>Write: tests/test_snake.c 생성
+    Write-->>Agent: 파일 생성 완료
+
+    Agent->>User: TC 작성 완료!
+`} />
+
+---
+
+## Agent가 생성한 TC 예시
+
+<Source
+  language="c"
+  code={`
+#include <assert.h>
+#include <stdio.h>
+#include "../include/snake.h"
+
+/**
+ * 뱀이 위로 이동하는지 테스트
+ */
+void test_snake_move_up(void) {
+    // Arrange
+    Snake snake;
+    snake_init(&snake, 5, 5);
+    int initial_y = snake.body[0].y;
+
+    // Act
+    snake_set_direction(&snake, DIRECTION_UP);
+    snake_move(&snake);
+
+    // Assert
+    assert(snake.body[0].y == initial_y - 1);
+    printf("[PASS] test_snake_move_up\\n");
+}
+
+/**
+ * 뱀이 아래로 이동하는지 테스트
+ */
+void test_snake_move_down(void) {
+    // Arrange
+    Snake snake;
+    snake_init(&snake, 5, 5);
+    int initial_y = snake.body[0].y;
+
+    // Act
+    snake_set_direction(&snake, DIRECTION_DOWN);
+    snake_move(&snake);
+
+    // Assert
+    assert(snake.body[0].y == initial_y + 1);
+    printf("[PASS] test_snake_move_down\\n");
+}
+
+int main(void) {
+    printf("=== Snake Move Tests ===\\n");
+    test_snake_move_up();
+    test_snake_move_down();
+    printf("All tests passed!\\n");
+    return 0;
+}
+`}
+/>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ecfdf5',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. TC 요청 시 **함수, 파일, 시나리오, 기대 결과** 명시
+2. **AAA 패턴**: Arrange(준비) → Act(실행) → Assert(검증)
+3. **구체적인 요청**이 좋은 TC를 만듦
+4. 템플릿을 활용하면 **일관된 요청** 가능
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-06-subagent와-agent-skills-6-3-background-agent--docs"
+  prevTitle="6.3 Background Agent"
+  nextLink="?path=/docs/chapters-07-test-case-작성-실습-7-2-tc-템플릿--docs"
+  nextTitle="7.2 TC 템플릿"
+/>

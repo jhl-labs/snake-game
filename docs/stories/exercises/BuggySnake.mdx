@@ -1,0 +1,128 @@
+import { Meta, Source } from '@storybook/blocks';
+import { ExerciseCard } from '../../components/ExerciseCard';
+import { Placeholder } from '../../components/Placeholder';
+
+<Meta title="Exercises/Buggy Snake" />
+
+# 실습: Buggy Snake
+
+`exercises/buggy_snake.c` 파일에 의도적으로 삽입된 버그를 찾아 수정합니다.
+
+---
+
+## 파일 위치
+
+`exercises/buggy_snake.c`
+
+<Placeholder type="image" alt="buggy_snake.c 파일 - 버그가 표시된 코드" />
+
+---
+
+## 버그 목록
+
+### 레벨 1: 초급
+
+<ExerciseCard
+  number={1}
+  title="NULL 포인터 체크 누락"
+  difficulty="초급"
+  description="snake_init 함수에서 p_snake가 NULL인 경우 처리가 없습니다."
+  hint="함수 시작 부분에 NULL 체크를 추가하세요"
+/>
+
+<ExerciseCard
+  number={2}
+  title="배열 경계 체크 누락"
+  difficulty="초급"
+  description="snake_grow 함수에서 MAX_SNAKE_LENGTH를 초과할 때의 처리가 없습니다."
+  hint="length 증가 전에 경계 조건을 확인하세요"
+/>
+
+<ExerciseCard
+  number={3}
+  title="초기화 값 오류"
+  difficulty="초급"
+  description="일부 변수의 초기값이 잘못 설정되어 있습니다."
+  hint="direction 초기값을 확인하세요"
+/>
+
+---
+
+### 레벨 2: 중급
+
+<ExerciseCard
+  number={4}
+  title="반대 방향 전환 허용"
+  difficulty="중급"
+  description="뱀이 현재 방향의 반대로 즉시 전환할 수 있어 자기 충돌이 발생합니다."
+  hint="새 방향이 현재 방향의 반대인지 확인하세요"
+/>
+
+<ExerciseCard
+  number={5}
+  title="메모리 해제 누락"
+  difficulty="중급"
+  description="동적 할당된 메모리가 해제되지 않습니다."
+  hint="snake_destroy 함수를 확인하세요"
+/>
+
+<ExerciseCard
+  number={6}
+  title="반환값 미확인"
+  difficulty="중급"
+  description="함수 반환값을 확인하지 않고 진행합니다."
+  hint="snake_init의 반환값 처리를 확인하세요"
+/>
+
+---
+
+### 레벨 3: 고급
+
+<ExerciseCard
+  number={7}
+  title="Off-by-one 에러"
+  difficulty="고급"
+  description="반복문의 경계 조건이 잘못되어 있습니다."
+  hint="body 배열 복사 시 인덱스를 확인하세요"
+/>
+
+---
+
+## 실습 방법
+
+### 1. 전체 분석 요청
+
+<Source
+  language="text"
+  code={`
+> exercises/buggy_snake.c 파일의 모든 버그를 찾아줘
+`}
+/>
+
+### 2. 개별 수정 요청
+
+<Source
+  language="text"
+  code={`
+> buggy_snake.c의 [n번 버그]를 수정해줘
+`}
+/>
+
+### 3. 검증
+
+<Source
+  language="bash"
+  code={`
+# 수정된 파일로 빌드
+gcc -o test_buggy exercises/buggy_snake.c -Iinclude
+./test_buggy
+`}
+/>
+
+---
+
+## 정답 확인
+
+수정된 버전: `exercises/solutions/buggy_snake_fixed.c`
+
+> **주의**: 먼저 직접 해보고, 정답은 막힐 때만 확인하세요!

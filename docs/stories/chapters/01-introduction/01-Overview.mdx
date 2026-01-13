@@ -1,0 +1,116 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ComparisonTable } from '../../../components/ComparisonTable';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/01. 소개 및 환경 설정/1.1 AI Agent란" />
+
+# Chapter 1: 소개 및 환경 설정
+
+**예상 소요 시간: 30분**
+
+---
+
+## 1.1 AI Agent란?
+
+AI Agent는 **사용자의 의도를 이해하고 자율적으로 작업을 수행**하는 AI 시스템입니다.
+단순한 챗봇과 달리, 실제로 파일을 읽고 쓰고, 명령어를 실행하며, 결과를 확인하고 수정합니다.
+
+<Mermaid chart={`
+flowchart TB
+    subgraph Input["입력"]
+        User([사용자])
+        Request[/"버그 찾아서 수정해줘"/]
+    end
+
+    subgraph AgentLoop["Agent Loop"]
+        direction TB
+        Think["🧠 추론<br/>무엇을 해야 할까?"]
+        Decide{판단}
+
+        subgraph Tools["도구 실행"]
+            Read["📖 Read<br/>파일 읽기"]
+            Search["🔍 Grep<br/>코드 검색"]
+            Edit["✏️ Edit<br/>코드 수정"]
+            Run["⚡ Bash<br/>명령 실행"]
+        end
+
+        Observe["👁️ 결과 관찰"]
+    end
+
+    subgraph Output["출력"]
+        Done([완료])
+        Response[/"수정 완료했습니다"/]
+    end
+
+    User --> Request --> Think
+    Think --> Decide
+    Decide -->|"도구 필요"| Tools
+    Decide -->|"작업 완료"| Done --> Response
+
+    Read & Search & Edit & Run --> Observe
+    Observe -->|"추가 작업 필요"| Think
+`} />
+> **AI Agent는 "추론 → 도구 실행 → 관찰"을 반복하며 자율적으로 작업을 완료합니다.**
+
+### 핵심 특징
+
+| 특징 | 설명 | 예시 |
+|------|------|------|
+| **컨텍스트 이해** | 프로젝트 구조, 코드 스타일을 파악 | "이 프로젝트는 MVC 패턴을 사용하네요" |
+| **자율적 실행** | 파일 읽기/쓰기, 명령어 실행 | 파일 검색 → 코드 수정 → 빌드 실행 |
+| **반복적 개선** | 결과를 확인하고 수정 | 빌드 에러 발생 → 원인 분석 → 수정 |
+
+### 기존 도구와의 차이
+
+**GitHub Copilot (자동완성)**
+- 현재 커서 위치에서 다음 코드 예측
+- 수동으로 탭 키를 눌러 수락
+- 컨텍스트: 현재 파일 위주
+
+**AI Agent (Cursor, Claude Code)**
+- 자연어로 복잡한 작업 요청
+- 자동으로 여러 파일 탐색/수정
+- 컨텍스트: 전체 프로젝트, 규칙 파일, 대화 히스토리
+
+---
+
+## 1.2 Cursor vs Claude Code 비교
+
+<ComparisonTable />
+
+
+### 언제 어떤 도구를 사용할까?
+
+**Cursor가 적합한 경우:**
+- GUI 환경을 선호할 때
+- 코드 수정과 동시에 미리보기가 필요할 때
+- VS Code 익스텐션을 함께 사용할 때
+
+**Claude Code가 적합한 경우:**
+- 터미널 환경에서 작업할 때
+- 대규모 리팩토링이나 분석 작업
+- CI/CD 파이프라인에 통합할 때
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#f0fdf4',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. AI Agent는 **자율적으로 코드를 탐색하고 수정**하는 시스템
+2. Cursor는 **GUI**, Claude Code는 **CLI** 인터페이스
+3. 두 도구 모두 **규칙 파일**을 통해 프로젝트별 지침 제공 가능
+
+</div>
+
+<ChapterNav
+  nextLink="?path=/docs/chapters-01-소개-및-환경-설정-1-2-cursor-기본-사용법--docs"
+  nextTitle="1.2 Cursor 기본 사용법"
+/>

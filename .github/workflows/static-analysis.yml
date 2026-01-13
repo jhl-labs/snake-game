@@ -1,0 +1,101 @@
+name: Static Analysis
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - 'src/**/*.c'
+      - 'include/**/*.h'
+  pull_request:
+    paths:
+      - 'src/**/*.c'
+      - 'include/**/*.h'
+
+jobs:
+  cppcheck:
+    name: Cppcheck Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Run cppcheck
+        run: |
+          cppcheck \
+            --enable=all \
+            --inconclusive \
+            --force \
+            --inline-suppr \
+            --suppress=missingIncludeSystem \
+            --suppress=unusedFunction \
+            -Iinclude \
+            -Iexternal/raylib/src \
+            --error-exitcode=1 \
+            --xml \
+            --output-file=cppcheck-report.xml \
+            src/ include/ 2>&1 | tee cppcheck-output.txt
+        continue-on-error: true
+
+      - name: Display cppcheck results
+        run: |
+          echo "## Cppcheck Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat cppcheck-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload cppcheck report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppcheck-report
+          path: |
+            cppcheck-report.xml
+            cppcheck-output.txt
+
+  compiler-warnings:
+    name: Compiler Warnings Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libgl1-mesa-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxi-dev \
+            libxcursor-dev \
+            libxinerama-dev
+
+      - name: Syntax check with strict warnings
+        run: |
+          gcc -fsyntax-only \
+            -Wall -Wextra -Wpedantic \
+            -Wshadow -Wdouble-promotion \
+            -Wformat=2 -Wformat-truncation \
+            -Wundef -fno-common \
+            -Iinclude \
+            -Iexternal/raylib/src \
+            src/*.c 2>&1 | tee warnings.txt
+        continue-on-error: true
+
+      - name: Display warnings
+        run: |
+          echo "## Compiler Warnings" >> $GITHUB_STEP_SUMMARY
+          if [ -s warnings.txt ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat warnings.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No warnings found!" >> $GITHUB_STEP_SUMMARY
+          fi
