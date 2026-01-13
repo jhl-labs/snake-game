@@ -25,6 +25,10 @@ typedef struct {
 } Snake;
 
 bool snake_init(Snake* p_snake, int start_x, int start_y) {
+    if (p_snake == NULL) {
+        return false;
+    }
+
     p_snake->body[0].x = start_x;
     p_snake->body[0].y = start_y;
     p_snake->length = 1;
