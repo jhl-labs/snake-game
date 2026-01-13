@@ -4,8 +4,8 @@ bin/
 *.exe
 
 # Libraries (downloaded)
-lib/
-external/
+#lib/
+#external/
 
 # Temporary files
 tmpclaude-*
