@@ -19,7 +19,7 @@ jobs:
         with:
           msystem: MINGW64
           update: false
-          install: mingw-w64-x86_64-gcc make
+          install: mingw-w64-x86_64-gcc make git
 
       - name: Cache raylib
         id: cache-raylib
