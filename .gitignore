@@ -15,3 +15,7 @@ tmpclaude-*
 .vscode/
 *.swp
 *~
+
+node_modules
+
+docs-dist
