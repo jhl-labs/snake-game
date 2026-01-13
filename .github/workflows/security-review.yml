@@ -16,6 +16,7 @@ jobs:
       contents: read
       pull-requests: write
       security-events: write
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -65,4 +66,3 @@ jobs:
             4. 수정 제안
 
             한국어로 작성해주세요.
-          timeout_minutes: 15
