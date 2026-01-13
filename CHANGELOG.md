@@ -18,6 +18,20 @@
 
 ---
 
+## [v1.1.0] - 2026-01-14
+
+### Added
+- 인트로 화면 추가 (게임 시작 전 타이틀 화면)
+- Claude Code Agent로 업그레이드 - 기능 구현 지원
+
+### Fixed
+- Makefile.linux에 intro.c 추가
+- Claude Agent 프롬프트 개선 및 디버깅
+- claude-review 워크플로우 권한 및 옵션 수정
+- security-review 워크플로우 권한 및 옵션 수정
+
+---
+
 ## [v1.0.0] - 2026-01-14
 
 ### Added
