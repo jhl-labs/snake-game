@@ -1,0 +1,58 @@
+name: Claude Code Agent
+
+on:
+  # Issue에서 @claude 호출 시 기능 구현
+  issues:
+    types: [opened, assigned]
+  # PR 자동 리뷰 및 코멘트 응답
+  pull_request:
+    types: [opened, synchronize, reopened]
+  # 코멘트에서 @claude 호출
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  claude-agent:
+    # @claude 멘션이 있거나, PR 이벤트이거나, claude 라벨이 있는 issue
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'claude')) ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code Agent
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # 기능 구현 시 새 브랜치 생성
+          branch_prefix: claude/
+          # 기본 프롬프트 (CLAUDE.md 참조)
+          prompt: |
+            프로젝트의 CLAUDE.md 파일을 참고하여 작업하세요.
+
+            ## 작업 가이드
+            - PR 리뷰 요청 시: 코드 품질, 안전성, 아키텍처 검토
+            - 기능 구현 요청 시: 브랜치 생성 → 코드 작성 → PR 생성
+            - 버그 수정 요청 시: 원인 분석 → 수정 → 테스트
+
+            ## 코딩 규칙
+            - 함수명: snake_case
+            - 타입명: PascalCase
+            - raylib은 renderer.c, main.c에서만 사용
+
+            한국어로 응답하세요.
