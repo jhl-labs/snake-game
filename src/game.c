@@ -7,34 +7,18 @@ bool game_init(Game* p_game) {
         return false;
     }
 
-    // 뱀 초기화 (그리드 중앙에 배치)
-    int32_t start_x = GRID_WIDTH / 2;
-    int32_t start_y = GRID_HEIGHT / 2;
-
-    if (!snake_init(&p_game->snake, start_x, start_y)) {
-        return false;
-    }
-
-    // 음식 초기화
-    food_init(&p_game->food);
-
-    // 게임 상태 초기화
-    p_game->state = GAME_STATE_PLAYING;
+    // 게임 상태를 메뉴로 초기화 (인트로 화면 표시)
+    p_game->state = GAME_STATE_MENU;
     p_game->score = 0;
     p_game->frame_counter = 0;
     p_game->should_update = false;
 
-    // 첫 음식 생성
-    if (!food_spawn(&p_game->food, &p_game->snake)) {
-        snake_destroy(&p_game->snake);
-        return false;
-    }
-
+    // 뱀과 음식은 게임 시작 시 초기화됨
     return true;
 }
 
 void game_destroy(Game* p_game) {
-    if (p_game != NULL) {
+    if (p_game != NULL && p_game->state != GAME_STATE_MENU) {
         snake_destroy(&p_game->snake);
         // food는 동적 할당이 없으므로 별도 해제 불필요
     }
@@ -45,8 +29,10 @@ void game_restart(Game* p_game) {
         return;
     }
 
-    // 기존 뱀 해제
-    snake_destroy(&p_game->snake);
+    // 기존 뱀 해제 (메뉴 상태가 아닌 경우에만)
+    if (p_game->state != GAME_STATE_MENU) {
+        snake_destroy(&p_game->snake);
+    }
 
     // 뱀 재초기화
     int32_t start_x = GRID_WIDTH / 2;

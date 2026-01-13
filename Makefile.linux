@@ -19,7 +19,8 @@ SOURCES = $(SRC_DIR)/main.c \
           $(SRC_DIR)/game.c \
           $(SRC_DIR)/snake.c \
           $(SRC_DIR)/food.c \
-          $(SRC_DIR)/renderer.c
+          $(SRC_DIR)/renderer.c \
+          $(SRC_DIR)/intro.c
 
 # 객체 파일
 OBJECTS = $(SOURCES:.c=.o)
