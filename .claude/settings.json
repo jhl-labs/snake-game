@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(gcc:*)",
+      "Bash(cppcheck:*)",
+      "Read(src/**)",
+      "Read(include/**)",
+      "Read(test/**)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Read(.env)"
+    ]
+  },
+  "env": {
+    "CC": "gcc",
+    "CFLAGS": "-Wall -Wextra"
+  },
+  "hooks": {
+    "PreToolUse": {
+      "Bash": {
+        "command": "echo 'Executing command...'",
+        "enabled": false
+      }
+    },
+    "PostToolUse": {
+      "Edit": {
+        "command": "echo 'File modified'",
+        "enabled": false
+      }
+    }
+  }
+}
