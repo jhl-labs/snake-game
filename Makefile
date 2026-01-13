@@ -3,9 +3,16 @@
 
 # 컴파일러 설정
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -O2
+CFLAGS = -Wall -Wextra -std=c11
 INCLUDES = -Iinclude -Iexternal/raylib/src
 LIBS = -Llib/mingw -lraylib -lopengl32 -lgdi32 -lwinmm
+
+# DEBUG 빌드 설정
+ifdef DEBUG
+    CFLAGS += -g -O0 -DDEBUG
+else
+    CFLAGS += -O2
+endif
 
 # 디렉토리
 SRC_DIR = src
@@ -43,8 +50,8 @@ $(BIN_DIR):
 
 # 정리
 clean:
-	rm -f $(SRC_DIR)/*.o
-	rm -f $(TARGET)
+	@powershell -Command "if (Test-Path '$(SRC_DIR)\*.o') { Remove-Item '$(SRC_DIR)\*.o' -Force }" 2>nul
+	@powershell -Command "if (Test-Path '$(TARGET)') { Remove-Item '$(TARGET)' -Force }" 2>nul
 
 # 재빌드
 rebuild: clean all
