@@ -14,40 +14,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup MinGW
-        uses: egor-tensin/setup-mingw@v2
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
         with:
-          platform: x64
+          msystem: MINGW64
+          update: false
+          install: mingw-w64-x86_64-gcc make
 
       - name: Cache raylib
         id: cache-raylib
         uses: actions/cache@v4
         with:
           path: external/raylib-src
-          key: raylib-windows-5.0
+          key: raylib-windows-5.0-msys2
 
       - name: Download and build raylib
         if: steps.cache-raylib.outputs.cache-hit != 'true'
-        shell: bash
+        shell: msys2 {0}
         run: |
           git clone --depth 1 --branch 5.0 https://github.com/raysan5/raylib.git external/raylib-src
           cd external/raylib-src/src
           make PLATFORM=PLATFORM_DESKTOP CC=gcc
 
       - name: Create lib directory
-        shell: bash
+        shell: msys2 {0}
         run: mkdir -p lib/mingw
 
       - name: Copy raylib library
-        shell: bash
+        shell: msys2 {0}
         run: cp external/raylib-src/src/libraylib.a lib/mingw/
 
       - name: Build project
-        shell: bash
+        shell: msys2 {0}
         run: make
 
       - name: Run tests
-        shell: bash
+        shell: msys2 {0}
         run: make test
 
       - name: Upload artifact
