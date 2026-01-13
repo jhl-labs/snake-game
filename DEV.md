@@ -64,7 +64,8 @@ curl -L -o raylib-mingw.zip "https://github.com/raysan5/raylib/releases/download
 unzip raylib-mingw.zip
 
 # 파일 복사
-cp raylib-5.5_win64_mingw-w64/lib/libraylib.a lib/
+mkdir -p lib/mingw
+cp raylib-5.5_win64_mingw-w64/lib/libraylib.a lib/mingw/
 cp raylib-5.5_win64_mingw-w64/include/*.h external/raylib/src/
 
 # 임시 파일 정리
@@ -140,10 +141,10 @@ ls external/raylib/src/
 
 **증상**: `cannot find -lraylib`
 
-**해결**: raylib 라이브러리가 `lib/`에 있는지 확인
+**해결**: raylib 라이브러리가 `lib/mingw/`에 있는지 확인
 
 ```bash
-ls lib/
+ls lib/mingw/
 # libraylib.a 파일이 있어야 함
 ```
 
@@ -161,7 +162,9 @@ snake-game/
 │   ├── snake.h
 │   ├── food.h
 │   └── renderer.h
-├── lib/                  # 라이브러리 (libraylib.a)
+├── lib/
+│   ├── mingw/            # Windows용 라이브러리 (libraylib.a)
+│   └── linux/            # Linux용 라이브러리 (libraylib.a)
 ├── src/                  # 소스 파일
 │   ├── main.c
 │   ├── game.c

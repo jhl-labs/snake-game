@@ -1,16 +1,16 @@
-# Makefile for Snake Game
-# MinGW-w64, raylib
+# Makefile for Snake Game (Linux)
+# GCC, raylib
 
 # 컴파일러 설정
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -O2
 INCLUDES = -Iinclude -Iexternal/raylib/src
-LIBS = -Llib/mingw -lraylib -lopengl32 -lgdi32 -lwinmm
+LIBS = -Llib/linux -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 # 디렉토리
 SRC_DIR = src
 INCLUDE_DIR = include
-LIB_DIR = lib
+LIB_DIR = lib-linux
 BIN_DIR = bin
 
 # 소스 파일
@@ -24,7 +24,7 @@ SOURCES = $(SRC_DIR)/main.c \
 OBJECTS = $(SOURCES:.c=.o)
 
 # 실행 파일
-TARGET = $(BIN_DIR)/snake.exe
+TARGET = $(BIN_DIR)/snake
 
 # 기본 타겟
 all: $(TARGET)
@@ -54,4 +54,3 @@ run: $(TARGET)
 	./$(TARGET)
 
 .PHONY: all clean rebuild run
-

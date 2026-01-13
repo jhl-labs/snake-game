@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stddef.h>
 #include "game.h"
 
 bool game_init(Game* p_game) {
