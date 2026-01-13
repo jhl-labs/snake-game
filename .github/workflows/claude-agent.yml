@@ -43,24 +43,20 @@ jobs:
           branch_prefix: claude/
           # 디버깅용 전체 출력 활성화
           show_full_output: true
-          # 기본 프롬프트 (CLAUDE.md 참조)
+          # 작업 지시 프롬프트
           prompt: |
-            프로젝트의 CLAUDE.md 파일을 참고하여 작업하세요.
+            사용자의 요청을 즉시 수행하세요. 질문하지 말고 바로 작업을 시작하세요.
 
-            ## 중요: 기능 구현 요청 시
-            1. 새 브랜치를 생성하세요 (claude/issue-번호-설명)
-            2. 코드를 작성하고 커밋하세요
-            3. PR을 생성하세요
-            4. Issue에 작업 완료 코멘트를 남기세요
+            ## 필수 작업 순서 (기능 구현 시)
+            1. git checkout -b claude/issue-{번호}-{설명} 으로 새 브랜치 생성
+            2. 코드 작성 및 파일 생성
+            3. git add && git commit 으로 커밋
+            4. git push origin {브랜치명}
+            5. gh pr create 로 PR 생성
 
-            ## 작업 가이드
-            - PR 리뷰 요청 시: 코드 품질, 안전성, 아키텍처 검토
-            - 기능 구현 요청 시: 브랜치 생성 → 코드 작성 → PR 생성
-            - 버그 수정 요청 시: 원인 분석 → 수정 → 테스트
-
-            ## 코딩 규칙
-            - 함수명: snake_case
-            - 타입명: PascalCase
+            ## 코딩 규칙 (CLAUDE.md 참조)
+            - 함수명: snake_case, 타입명: PascalCase
             - raylib은 renderer.c, main.c에서만 사용
+            - NULL 포인터 체크 필수
 
-            한국어로 응답하세요.
+            한국어로 응답하세요. 작업 완료 후 결과를 요약해주세요.
