@@ -83,3 +83,37 @@ void food_deactivate(Food* p_food) {
     }
 }
 
+bool food_spawn_versus(Food* p_food, const Snake* p_snake1, const Snake* p_snake2) {
+    if (p_food == NULL || p_snake1 == NULL || p_snake2 == NULL) {
+        return false;
+    }
+
+    // 랜덤 시드 초기화 (한 번만)
+    static bool s_seed_initialized = false;
+    if (!s_seed_initialized) {
+        srand((unsigned int)time(NULL));
+        s_seed_initialized = true;
+    }
+
+    // 최대 시도 횟수 (무한 루프 방지)
+    const uint32_t max_attempts = GRID_WIDTH * GRID_HEIGHT * 2;
+    uint32_t attempts = 0;
+
+    Position new_pos;
+    do {
+        new_pos.x = rand() % GRID_WIDTH;
+        new_pos.y = rand() % GRID_HEIGHT;
+        attempts++;
+
+        if (attempts >= max_attempts) {
+            return false;
+        }
+    } while (is_position_in_snake(&new_pos, p_snake1) ||
+             is_position_in_snake(&new_pos, p_snake2));
+
+    p_food->position = new_pos;
+    p_food->is_active = true;
+
+    return true;
+}
+

@@ -61,5 +61,32 @@ typedef enum {
     GAME_STATE_PAUSED
 } GameState;
 
+// 게임 모드
+typedef enum {
+    GAME_MODE_SINGLE = 0,
+    GAME_MODE_VERSUS
+} GameMode;
+
+// 게임 결과 (2인용 모드)
+typedef enum {
+    GAME_RESULT_NONE = 0,
+    GAME_RESULT_P1_WIN,
+    GAME_RESULT_P2_WIN,
+    GAME_RESULT_DRAW
+} GameResult;
+
+// 2인용 모드 시작 위치
+#define P1_START_X 10
+#define P1_START_Y 15
+#define P2_START_X 30
+#define P2_START_Y 15
+
+// P2 색상 정의 (파랑색)
+#define COLOR_SNAKE2_R 0
+#define COLOR_SNAKE2_G 100
+#define COLOR_SNAKE2_G_HEAD 200
+#define COLOR_SNAKE2_B 255
+#define COLOR_SNAKE2_A 255
+
 #endif // SNAKE_GAME_CONSTANTS_H
 
