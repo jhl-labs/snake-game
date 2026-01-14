@@ -4,12 +4,14 @@
 #include <stdbool.h>
 #include "snake.h"
 #include "food.h"
+#include "enemy.h"
 #include "game_constants.h"
 
 // 게임 상태 구조체
 typedef struct {
     Snake snake;
     Food food;
+    Enemy enemy;
     GameState state;
     uint32_t score;
     uint32_t frame_counter;
@@ -84,6 +86,14 @@ const Snake* game_get_snake(const Game* p_game);
  * @return 음식 객체 포인터 (const)
  */
 const Food* game_get_food(const Game* p_game);
+
+/**
+ * 게임의 적 뱀 객체를 반환합니다 (읽기 전용).
+ * 
+ * @param p_game 게임 객체 포인터
+ * @return 적 뱀 객체 포인터 (const)
+ */
+const Enemy* game_get_enemy(const Game* p_game);
 
 #endif // SNAKE_GAME_GAME_H
 

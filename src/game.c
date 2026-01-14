@@ -20,6 +20,7 @@ bool game_init(Game* p_game) {
 void game_destroy(Game* p_game) {
     if (p_game != NULL && p_game->state != GAME_STATE_MENU) {
         snake_destroy(&p_game->snake);
+        enemy_destroy(&p_game->enemy);
         // food는 동적 할당이 없으므로 별도 해제 불필요
     }
 }
@@ -29,9 +30,10 @@ void game_restart(Game* p_game) {
         return;
     }
 
-    // 기존 뱀 해제 (메뉴 상태가 아닌 경우에만)
+    // 기존 객체 해제 (메뉴 상태가 아닌 경우에만)
     if (p_game->state != GAME_STATE_MENU) {
         snake_destroy(&p_game->snake);
+        enemy_destroy(&p_game->enemy);
     }
 
     // 뱀 재초기화
@@ -42,6 +44,9 @@ void game_restart(Game* p_game) {
     // 음식 재생성
     food_init(&p_game->food);
     food_spawn(&p_game->food, &p_game->snake);
+
+    // 적 뱀 초기화
+    enemy_init(&p_game->enemy, &p_game->snake);
 
     // 게임 상태 재설정
     p_game->state = GAME_STATE_PLAYING;
@@ -57,7 +62,15 @@ void game_update(Game* p_game) {
 
     p_game->frame_counter++;
 
-    // 게임 속도에 맞춰 업데이트
+    // 적 뱀 업데이트 (매 프레임 - 내부적으로 지연 처리)
+    enemy_update(&p_game->enemy);
+
+    // 적 뱀이 비활성화되면 리스폰
+    if (!enemy_is_active(&p_game->enemy)) {
+        enemy_respawn(&p_game->enemy, &p_game->snake);
+    }
+
+    // 게임 속도에 맞춰 플레이어 뱀 업데이트
     if (p_game->frame_counter % GAME_SPEED != 0) {
         return;
     }
@@ -73,6 +86,12 @@ void game_update(Game* p_game) {
 
     // 자기 자신과의 충돌 체크
     if (snake_check_self_collision(&p_game->snake)) {
+        p_game->state = GAME_STATE_GAME_OVER;
+        return;
+    }
+
+    // 적 뱀과의 충돌 체크
+    if (enemy_check_collision_with_player(&p_game->enemy, &p_game->snake)) {
         p_game->state = GAME_STATE_GAME_OVER;
         return;
     }
@@ -129,5 +148,12 @@ const Food* game_get_food(const Game* p_game) {
         return NULL;
     }
     return &p_game->food;
+}
+
+const Enemy* game_get_enemy(const Game* p_game) {
+    if (p_game == NULL) {
+        return NULL;
+    }
+    return &p_game->enemy;
 }
 
