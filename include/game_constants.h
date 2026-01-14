@@ -14,6 +14,10 @@
 #define INITIAL_SNAKE_LENGTH 3
 #define MAX_SNAKE_LENGTH (GRID_WIDTH * GRID_HEIGHT)
 
+// 적 설정
+#define ENEMY_INITIAL_LENGTH 3
+#define ENEMY_MOVE_DELAY 15  // 플레이어(GAME_SPEED=10)보다 느림
+
 // 색상 정의 (raylib Color 구조체와 호환)
 #define COLOR_BACKGROUND_R 20
 #define COLOR_BACKGROUND_G 20
@@ -30,6 +34,17 @@
 #define COLOR_FOOD_G 0
 #define COLOR_FOOD_B 0
 #define COLOR_FOOD_A 255
+
+// 적 색상 (주황색)
+#define COLOR_ENEMY_R 255
+#define COLOR_ENEMY_G 100
+#define COLOR_ENEMY_B 0
+#define COLOR_ENEMY_A 255
+
+#define COLOR_ENEMY_HEAD_R 255
+#define COLOR_ENEMY_HEAD_G 50
+#define COLOR_ENEMY_HEAD_B 0
+#define COLOR_ENEMY_HEAD_A 255
 
 #define COLOR_GRID_R 50
 #define COLOR_GRID_G 50
