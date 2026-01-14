@@ -3,6 +3,7 @@
 #include "game_constants.h"
 #include "snake.h"
 #include "food.h"
+#include "enemy.h"
 
 // raylib 헤더
 // raylib이 external/raylib/src에 있다고 가정
@@ -54,6 +55,20 @@ static const Color COLOR_TEXT = {
 
 static const Color COLOR_LIGHTGRAY = {
     200, 200, 200, 255
+};
+
+static const Color COLOR_ENEMY = {
+    COLOR_ENEMY_R,
+    COLOR_ENEMY_G,
+    COLOR_ENEMY_B,
+    COLOR_ENEMY_A
+};
+
+static const Color COLOR_ENEMY_HEAD = {
+    COLOR_ENEMY_HEAD_R,
+    COLOR_ENEMY_HEAD_G,
+    COLOR_ENEMY_HEAD_B,
+    COLOR_ENEMY_HEAD_A
 };
 
 // 그리드 오프셋 계산 (화면 중앙에 배치)
@@ -150,6 +165,33 @@ static void draw_food(const Food* p_food) {
                   CELL_SIZE - 4, CELL_SIZE - 4, COLOR_FOOD);
 }
 
+// 적 뱀 그리기
+static void draw_enemy(const Enemy* p_enemy) {
+    if (p_enemy == NULL || !enemy_is_active(p_enemy)) {
+        return;
+    }
+
+    const Snake* p_snake = enemy_get_snake(p_enemy);
+    if (p_snake == NULL || p_snake->p_body == NULL || p_snake->length == 0) {
+        return;
+    }
+
+    int offset_x = calculate_grid_offset_x();
+    int offset_y = calculate_grid_offset_y();
+
+    for (uint32_t i = 0; i < p_snake->length; i++) {
+        Position pos = snake_get_position_at(p_snake, i);
+        int screen_x = offset_x + pos.x * CELL_SIZE;
+        int screen_y = offset_y + pos.y * CELL_SIZE;
+
+        // 머리는 다른 색상
+        Color color = (i == 0) ? COLOR_ENEMY_HEAD : COLOR_ENEMY;
+
+        DrawRectangle(screen_x + 1, screen_y + 1, 
+                      CELL_SIZE - 2, CELL_SIZE - 2, color);
+    }
+}
+
 // 점수 표시
 static void draw_score(uint32_t score) {
     char score_text[32];
@@ -175,7 +217,10 @@ void renderer_draw_game(const Game* p_game) {
     // 음식
     draw_food(game_get_food(p_game));
 
-    // 뱀
+    // 적 뱀
+    draw_enemy(game_get_enemy(p_game));
+
+    // 플레이어 뱀
     draw_snake(game_get_snake(p_game));
 
     // 점수
