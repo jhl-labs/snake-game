@@ -2,7 +2,8 @@
 # MinGW-w64, raylib
 
 # 컴파일러 설정
-CC = gcc
+# GCC 15.2.0에 크래시 버그가 있어서 clang 사용
+CC = clang
 CFLAGS = -Wall -Wextra -std=c11
 INCLUDES = -Iinclude -Iexternal/raylib/src
 LIBS = -Llib/mingw -lraylib -lopengl32 -lgdi32 -lwinmm
@@ -28,6 +29,7 @@ SOURCES = $(SRC_DIR)/main.c \
           $(SRC_DIR)/game.c \
           $(SRC_DIR)/snake.c \
           $(SRC_DIR)/food.c \
+          $(SRC_DIR)/enemy.c \
           $(SRC_DIR)/renderer.c \
           $(SRC_DIR)/intro.c
 
@@ -59,6 +61,33 @@ test: $(TEST_TARGET)
 $(TEST_TARGET): $(TEST_DIR)/test_snake.c $(SRC_DIR)/snake.c | $(BIN_DIR)
 	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@
 
+# 전체 테스트 빌드 및 실행
+TEST_FOOD_TARGET = $(BIN_DIR)/test_food.exe
+TEST_GAME_TARGET = $(BIN_DIR)/test_game.exe
+TEST_ENEMY_TARGET = $(BIN_DIR)/test_enemy.exe
+
+test-all: $(TEST_TARGET) $(TEST_FOOD_TARGET) $(TEST_GAME_TARGET) $(TEST_ENEMY_TARGET)
+	@echo "=== Running All Tests ==="
+	@echo ""
+	@./$(TEST_TARGET)
+	@echo ""
+	@./$(TEST_FOOD_TARGET)
+	@echo ""
+	@./$(TEST_GAME_TARGET)
+	@echo ""
+	@./$(TEST_ENEMY_TARGET)
+	@echo ""
+	@echo "=== All Test Suites Completed ==="
+
+$(TEST_FOOD_TARGET): $(TEST_DIR)/test_food.c $(SRC_DIR)/food.c $(SRC_DIR)/snake.c | $(BIN_DIR)
+	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@
+
+$(TEST_GAME_TARGET): $(TEST_DIR)/test_game.c $(SRC_DIR)/game.c $(SRC_DIR)/snake.c $(SRC_DIR)/food.c $(SRC_DIR)/enemy.c | $(BIN_DIR)
+	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@
+
+$(TEST_ENEMY_TARGET): $(TEST_DIR)/test_enemy.c $(SRC_DIR)/enemy.c $(SRC_DIR)/snake.c | $(BIN_DIR)
+	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@
+
 # 정리
 clean:
 	@powershell -Command "if (Test-Path '$(SRC_DIR)\*.o') { Remove-Item '$(SRC_DIR)\*.o' -Force }" 2>nul
@@ -71,4 +100,4 @@ rebuild: clean all
 run: $(TARGET)
 	./$(TARGET)
 
-.PHONY: all clean rebuild run test
+.PHONY: all clean rebuild run test test-all
