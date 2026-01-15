@@ -1,0 +1,299 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/01. 소개 및 환경 설정/1.4 Windows 개발 환경 설정" />
+
+# 1.4 Windows 개발 환경 설정
+
+---
+
+## 개요
+
+이 챕터에서는 Windows에서 C 언어 개발 환경을 설정합니다.
+**MSYS2/MinGW**를 사용하여 Linux와 유사한 개발 경험을 제공합니다.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Tools["필수 도구"]
+        Git["Git SCM"]
+        MSYS["MSYS2/MinGW"]
+        PS["PowerShell 7"]
+        Cursor["Cursor IDE"]
+        Claude["Claude Code"]
+    end
+
+    Git -->|"버전 관리"| VCS["소스 관리"]
+    MSYS -->|"gcc, make"| Build["빌드 환경"]
+    PS -->|"터미널"| Agent["AI Agent"]
+    Cursor -->|"편집기"| Dev["개발 환경"]
+    Claude -->|"CLI"| Agent
+`} />
+
+---
+
+## 왜 MSYS2/MinGW인가?
+
+| 항목 | 설명 |
+|------|------|
+| **설치 용이성** | MSVC 대비 가볍고 빠른 설치 |
+| **Linux 호환** | WSL과 유사한 개발 경험 제공 |
+| **패키지 관리** | `pacman`으로 라이브러리 관리 |
+| **이식성** | Linux/Mac과 동일한 빌드 명령어 |
+
+> **참고**: WSL 설치가 가능한 환경이라면 WSL을 사용해도 됩니다.
+
+---
+
+## 1. Git SCM 설치
+
+Git은 소스 코드 버전 관리를 위한 필수 도구입니다.
+
+### 다운로드 및 설치
+
+- **공식 홈페이지**: [https://git-scm.com](https://git-scm.com)
+
+설치 시 기본 옵션을 그대로 사용해도 됩니다.
+
+### 설치 확인
+
+<Source
+  language="bash"
+  code={`
+git --version
+# git version 2.x.x
+`}
+/>
+
+---
+
+## 2. MSYS2 설치
+
+### 다운로드
+
+공식 홈페이지 또는 GitHub에서 설치 파일을 다운로드합니다:
+
+- **공식 홈페이지**: [https://www.msys2.org](https://www.msys2.org)
+- **GitHub 릴리즈**: [msys2-installer](https://github.com/msys2/msys2-installer/releases)
+
+<Source
+  language="text"
+  code={`
+# 직접 다운로드 링크 (2025-12-13 버전)
+https://github.com/msys2/msys2-installer/releases/download/2025-12-13/msys2-x86_64-20251213.exe
+`}
+/>
+
+### 설치 후 초기 설정
+
+MSYS2 설치 완료 후, **MSYS2 MINGW64** 터미널을 실행하고 시스템을 업데이트합니다:
+
+<Source
+  language="bash"
+  code={`
+# 시스템 패키지 업데이트
+pacman -Syu
+`}
+/>
+
+> **주의**: 업데이트 중 터미널이 닫히면 다시 열고 `pacman -Syu`를 한 번 더 실행하세요.
+
+---
+
+## 3. 필수 패키지 설치
+
+Snake Game 프로젝트 빌드에 필요한 패키지를 설치합니다:
+
+<Source
+  language="bash"
+  code={`
+pacman -S --needed mingw-w64-x86_64-raylib \\
+                   mingw-w64-x86_64-gcc \\
+                   mingw-w64-x86_64-cmake \\
+                   mingw-w64-x86_64-make \\
+                   mingw-w64-x86_64-pkg-config
+`}
+/>
+
+### 설치되는 패키지 설명
+
+| 패키지 | 용도 |
+|--------|------|
+| `mingw-w64-x86_64-gcc` | C/C++ 컴파일러 |
+| `mingw-w64-x86_64-make` | 빌드 자동화 도구 |
+| `mingw-w64-x86_64-cmake` | 크로스 플랫폼 빌드 시스템 |
+| `mingw-w64-x86_64-raylib` | 게임 그래픽 라이브러리 |
+| `mingw-w64-x86_64-pkg-config` | 라이브러리 설정 도구 |
+
+---
+
+## 4. PowerShell 7 설치
+
+AI Agent가 원활하게 동작하려면 **PowerShell 7** 이상을 권장합니다.
+
+### 다운로드
+
+- **공식 릴리즈**: [PowerShell GitHub Releases](https://github.com/PowerShell/PowerShell/releases)
+
+<Source
+  language="text"
+  code={`
+# 권장 설치 파일 (MSI Installer)
+https://github.com/PowerShell/PowerShell/releases/download/v7.5.4/PowerShell-7.5.4-win-x64.msi
+`}
+/>
+
+### PowerShell 7을 권장하는 이유
+
+| 항목 | 설명 |
+|------|------|
+| **최신 기능** | Windows PowerShell 5.1 대비 개선된 기능 |
+| **크로스 플랫폼** | Windows, Linux, macOS 지원 |
+| **AI Agent 호환** | Claude Code 등 AI 도구와 호환성 향상 |
+
+> **WSL 사용자**: WSL을 사용하신다면 기본 Bash 셸을 그대로 사용하시면 됩니다.
+
+---
+
+## 5. Cursor 설치
+
+### 다운로드 및 설치
+
+- **공식 홈페이지**: [https://cursor.com/download](https://cursor.com/download)
+
+Installer를 다운로드하여 설치합니다.
+
+### 설치 후 확인
+
+1. Cursor 실행
+2. 프로젝트 폴더 열기: `File > Open Folder > C:\git\snake-game`
+3. 터미널 열기: `` Ctrl+` ``
+
+---
+
+## 6. Claude Code 설치
+
+Claude Code는 터미널에서 실행되는 AI 코딩 도구입니다.
+
+### PowerShell에서 설치
+
+PowerShell을 **관리자 권한**으로 실행한 후 다음 명령어를 입력합니다:
+
+<img width="338" height="72" alt="PowerShell 설치 명령" src="https://github.com/user-attachments/assets/4fa0dba9-7699-4aa2-acd6-da679a67e594" />
+
+<Source
+  language="powershell"
+  code={`
+irm https://claude.ai/install.ps1 | iex
+`}
+/>
+
+### 설치가 안 될 경우 (대안)
+
+네트워크 문제 등으로 설치가 안 될 경우, 직접 실행 파일을 다운로드합니다:
+
+<Source
+  language="text"
+  code={`
+# 직접 다운로드 링크
+https://github.com/jhl-labs/snake-game/releases/download/v1.1.0/claude.exe
+`}
+/>
+
+다운로드한 `claude.exe`를 적절한 경로에 저장하고 실행합니다.
+
+### 환경 변수 설정
+
+`irm` 명령으로 설치한 경우, `claude` 명령을 어디서든 실행하려면 **환경 변수 PATH** 설정이 필요합니다.
+
+**환경 변수 설정 방법:**
+
+1. Windows 검색에서 "환경 변수" 검색 후 "시스템 환경 변수 편집" 클릭
+
+<img width="299" height="48" alt="환경 변수 검색" src="https://github.com/user-attachments/assets/5c3b8d3e-05de-4224-bbbd-9abcfa2d0254" />
+
+2. "환경 변수" 버튼 클릭 후 "Path" 선택하여 편집
+
+<img width="517" height="495" alt="환경 변수 편집" src="https://github.com/user-attachments/assets/c274efe5-c5e5-4368-9987-1059de9f9534" />
+
+3. Claude Code가 설치된 경로 추가
+
+<img width="791" height="613" alt="Path 추가" src="https://github.com/user-attachments/assets/da754913-7948-48eb-956a-454699446ea8" />
+
+### 설치 확인
+
+<Source
+  language="bash"
+  code={`
+claude --version
+`}
+/>
+
+---
+
+## 7. MSYS2 환경 변수 설정 (선택)
+
+MSYS2의 MinGW 바이너리를 시스템 PATH에 추가하면 어디서든 `gcc`, `make` 명령을 사용할 수 있습니다:
+
+<Source
+  language="text"
+  code={`
+# 환경 변수 PATH에 추가할 경로
+C:\\msys64\\mingw64\\bin
+`}
+/>
+
+---
+
+## 설치 확인
+
+모든 설치가 완료되면 터미널에서 다음 명령어로 확인합니다:
+
+<Source
+  language="bash"
+  code={`
+# Git 버전 확인
+git --version
+
+# GCC 버전 확인
+gcc --version
+
+# Make 버전 확인
+mingw32-make --version
+
+# Claude Code 버전 확인
+claude --version
+
+# 프로젝트 빌드 테스트
+cd C:\\git\\snake-game
+make
+`}
+/>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ede9fe',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **Git SCM** - 소스 코드 버전 관리 도구
+2. **MSYS2/MinGW** - Windows에서 Linux와 유사한 C 개발 환경 제공
+3. **pacman** - `pacman -S` 명령으로 필수 패키지 설치
+4. **PowerShell 7** - AI Agent 호환성을 위해 권장
+5. **Cursor** - AI 기반 IDE로 개발 생산성 향상
+6. **Claude Code** - 터미널 기반 AI 코딩 도구 (`irm https://claude.ai/install.ps1 | iex`)
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-01-소개-및-환경-설정-1-3-claude-code-기본-사용법--docs"
+  prevTitle="1.3 Claude Code 기본 사용법"
+  nextLink="?path=/docs/chapters-01-소개-및-환경-설정-1-5-환경-정리-및-로그아웃--docs"
+  nextTitle="1.5 환경 정리 및 로그아웃"
+/>

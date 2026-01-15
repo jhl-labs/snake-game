@@ -1,0 +1,146 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/01. 소개 및 환경 설정/1.5 환경 정리 및 로그아웃" />
+
+# 1.5 환경 정리 및 로그아웃
+
+---
+
+## 개요
+
+교육 종료 후 또는 계정 전환이 필요할 때, **Claude Code**와 **Cursor**의 인증 정보를 정리하는 방법을 안내합니다.
+
+> **중요**: 공용 PC나 교육용 노트북에서는 반드시 로그아웃 후 자리를 비워주세요.
+
+---
+
+## Claude Code 로그인 정보 삭제
+
+Claude Code에는 명시적인 로그아웃 명령어가 없습니다. 저장된 인증 정보를 **직접 삭제**해야 합니다.
+
+### Windows (PowerShell)
+
+<Source
+  language="powershell"
+  code={`
+# Claude Code 설정 폴더 삭제
+Remove-Item -Path "$env:USERPROFILE\\.claude" -Recurse -Force
+
+# Claude Code 설정 파일 삭제
+Remove-Item -Path "$env:USERPROFILE\\.claude.json" -Force
+`}
+/>
+
+### Windows (CMD)
+
+<Source
+  language="batch"
+  code={`
+rmdir /s /q "%USERPROFILE%\\.claude"
+del "%USERPROFILE%\\.claude.json"
+`}
+/>
+
+### macOS / Linux
+
+<Source
+  language="bash"
+  code={`
+rm -rf ~/.claude
+rm -f ~/.claude.json
+`}
+/>
+
+### 삭제되는 항목
+
+| 항목 | 설명 |
+|------|------|
+| 인증 정보 | API 키 및 로그인 세션 |
+| 도구 규칙 | 허용된 도구 설정 |
+| MCP 서버 구성 | 연결된 MCP 서버 정보 |
+| 세션 기록 | 이전 대화 히스토리 |
+
+> **주의**: 이 작업은 되돌릴 수 없습니다. 필요한 설정이 있다면 미리 백업하세요.
+
+### 재로그인
+
+삭제 후 `claude` 명령어를 실행하면 새로운 로그인 프로세스가 시작됩니다:
+
+<Source
+  language="bash"
+  code={`
+claude
+# 브라우저가 열리며 로그인 페이지로 이동
+`}
+/>
+
+---
+
+## Cursor 로그아웃
+
+Cursor는 설정 메뉴를 통해 로그아웃할 수 있습니다.
+
+### 로그아웃 단계
+
+1. **Cursor** 애플리케이션 실행
+2. 상단 메뉴: `File` > `Preferences` > `Settings`
+   - 또는 단축키: `Ctrl + ,` (Windows/Linux) / `Cmd + ,` (Mac)
+3. **General** 탭 선택
+4. 페이지 하단으로 스크롤
+5. **Log Out** 버튼 클릭
+
+![](logout.png)
+
+### 단축키 요약
+
+| 플랫폼 | 설정 열기 단축키 |
+|--------|------------------|
+| Windows / Linux | `Ctrl + ,` |
+| macOS | `Cmd + ,` |
+
+---
+
+## 체크리스트
+
+교육 종료 시 다음 항목을 확인하세요:
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+- [ ] Claude Code 인증 정보 삭제 완료
+- [ ] Cursor 로그아웃 완료
+- [ ] 브라우저 로그인 세션 확인 (GitHub, Anthropic 등)
+- [ ] 개인 파일 정리
+
+</div>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ede9fe',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **Claude Code** - `~/.claude` 폴더와 `~/.claude.json` 파일 삭제로 로그아웃
+2. **Cursor** - `Settings > General > Log Out` 버튼으로 로그아웃
+3. **공용 PC** - 반드시 모든 인증 정보 정리 후 자리 비우기
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-01-소개-및-환경-설정-1-4-windows-개발-환경-설정-msys2--docs"
+  prevTitle="1.4 Windows 개발 환경 설정 (MSYS2)"
+  nextLink="?path=/docs/chapters-02-agent-기본-개념-2-1-agent-동작-원리--docs"
+  nextTitle="2.1 Agent 동작 원리"
+/>
