@@ -1,0 +1,647 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/09. MCP/9.2 MCP 실전 활용 사례" />
+
+# 9.2 MCP 실전 활용 사례
+
+---
+
+## 개요
+
+이 챕터에서는 실제 개발 환경에서 유용하게 활용할 수 있는 **MCP 서버들의 실전 사례**를 소개합니다.
+각 서버의 설정 방법과 활용 예시를 통해 AI 코딩 도구의 기능을 확장하는 방법을 배웁니다.
+
+<Mermaid chart={`
+flowchart TB
+    subgraph MCPServers["실전 MCP 서버"]
+        Context7["Context7<br/>최신 문서 검색"]
+        GitHub["GitHub<br/>저장소 관리"]
+        Figma["Figma<br/>디자인 연동"]
+        Browser["Browser<br/>웹 자동화"]
+        DB["Database<br/>데이터 접근"]
+        Slack["Slack<br/>팀 협업"]
+    end
+
+    AI["AI Agent"] --> MCPServers
+`} />
+
+---
+
+## 1. Context7 - 최신 라이브러리 문서 검색
+
+### Context7이란?
+
+**Context7**은 npm 패키지, 라이브러리의 **최신 문서를 실시간으로 검색**해주는 MCP 서버입니다.
+AI가 오래된 정보가 아닌 최신 API 문서를 참조하여 정확한 코드를 생성할 수 있게 해줍니다.
+
+### 왜 필요한가?
+
+| 문제 | Context7 해결책 |
+|------|----------------|
+| AI의 학습 데이터가 오래됨 | 실시간 최신 문서 검색 |
+| Deprecated API 사용 | 현재 버전 API 참조 |
+| 버전별 차이 모름 | 특정 버전 문서 조회 |
+
+### 설정 방법
+
+<Source
+  language="json"
+  code={`
+// ~/.claude.json 또는 .cursor/mcp.json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/context7-mcp"]
+    }
+  }
+}
+`}
+/>
+
+### 활용 예시
+
+<Source
+  language="text"
+  code={`
+> React 19의 새로운 use() hook 사용법을 알려줘
+
+> Next.js 15에서 Server Actions 설정하는 방법을 찾아줘
+
+> raylib 5.0의 새로운 함수들을 확인해줘
+
+# Context7이 최신 공식 문서에서 정보를 가져와
+# 정확한 코드 예제와 함께 설명
+`}
+/>
+
+### 실전 시나리오
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 새 프로젝트에서 최신 라이브러리 사용
+
+> Tailwind CSS v4의 새로운 설정 방식으로 프로젝트를 세팅해줘
+
+# AI 응답:
+# 1. Context7로 Tailwind v4 공식 문서 검색
+# 2. 최신 설정 파일 구조 확인
+# 3. 정확한 설정 코드 생성
+`}
+/>
+
+---
+
+## 2. GitHub - 저장소 및 이슈 관리
+
+### GitHub MCP란?
+
+**GitHub MCP 서버**는 저장소, 이슈, PR, 코드 검색 등 GitHub의 모든 기능에 AI가 접근할 수 있게 해줍니다.
+
+### 설정 방법
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "ghp_xxxxxxxxxxxxxxxxxxxx"
+      }
+    }
+  }
+}
+`}
+/>
+
+> **GitHub Token 발급**: Settings > Developer settings > Personal access tokens > Generate new token
+
+### 활용 예시
+
+#### 저장소 관리
+
+<Source
+  language="text"
+  code={`
+> jhl-labs/snake-game 저장소의 최근 커밋 10개를 보여줘
+
+> 이 저장소의 브랜치 목록과 각 브랜치의 마지막 커밋을 알려줘
+
+> main 브랜치와 feature/power-up 브랜치의 차이점을 분석해줘
+`}
+/>
+
+#### 이슈 관리
+
+<Source
+  language="text"
+  code={`
+> 열린 이슈 목록을 우선순위별로 정리해줘
+
+> "버그: 뱀이 벽을 통과함"이라는 제목으로 이슈를 생성해줘
+
+> #42 이슈에 "수정 완료했습니다. PR #45를 확인해주세요"라고 코멘트 달아줘
+`}
+/>
+
+#### PR 관리
+
+<Source
+  language="text"
+  code={`
+> 열린 PR 목록과 각각의 리뷰 상태를 보여줘
+
+> PR #45의 변경 사항을 분석하고 코드 리뷰해줘
+
+> 이 변경사항으로 PR을 생성해줘. 제목은 "feat: 파워업 시스템 추가"
+`}
+/>
+
+### 실전 시나리오
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 버그 리포트부터 수정까지
+
+> 사용자가 보고한 #123 이슈를 확인하고, 관련 코드를 찾아서 수정한 뒤,
+> PR을 생성하고 이슈에 링크해줘
+
+# AI 작업 흐름:
+# 1. #123 이슈 내용 확인 (GitHub MCP)
+# 2. 관련 코드 검색 및 분석
+# 3. 버그 수정
+# 4. PR 생성 (GitHub MCP)
+# 5. 이슈에 PR 링크 코멘트 (GitHub MCP)
+`}
+/>
+
+---
+
+## 3. Figma - 디자인 연동
+
+### Figma MCP란?
+
+**Figma MCP 서버**는 Figma 디자인 파일에서 컴포넌트, 스타일, 레이아웃 정보를 추출하여
+AI가 디자인을 코드로 변환할 수 있게 해줍니다.
+
+### 설정 방법
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-figma"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "figd_xxxxxxxxxxxx"
+      }
+    }
+  }
+}
+`}
+/>
+
+> **Figma Token 발급**: Figma > Account Settings > Personal access tokens
+
+### 활용 예시
+
+<Source
+  language="text"
+  code={`
+> 이 Figma 파일에서 Button 컴포넌트의 스타일을 추출해서 CSS로 변환해줘
+
+> 메인 페이지 디자인을 React 컴포넌트로 구현해줘
+
+> 디자인 시스템의 색상 팔레트를 Tailwind 설정으로 변환해줘
+`}
+/>
+
+### 실전 시나리오
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 디자인 시스템 구현
+
+> Figma 파일 "Design System v2"에서 모든 컴포넌트를 분석하고,
+> React + Tailwind로 컴포넌트 라이브러리를 생성해줘
+
+# AI 작업 흐름:
+# 1. Figma에서 컴포넌트 목록 추출
+# 2. 각 컴포넌트의 스타일, 변형(variants) 분석
+# 3. React 컴포넌트 코드 생성
+# 4. Storybook 문서 자동 생성
+`}
+/>
+
+---
+
+## 4. Puppeteer/Playwright - 브라우저 자동화
+
+### 브라우저 MCP란?
+
+**Puppeteer/Playwright MCP 서버**는 AI가 실제 브라우저를 제어하여
+웹 페이지 탐색, 스크린샷, 테스트 자동화를 수행할 수 있게 해줍니다.
+
+### 설정 방법
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-puppeteer"]
+    }
+  }
+}
+`}
+/>
+
+### 활용 예시
+
+#### 웹 스크래핑
+
+<Source
+  language="text"
+  code={`
+> https://news.ycombinator.com 에서 오늘의 인기 글 10개를 가져와줘
+
+> 경쟁사 웹사이트의 가격 정보를 수집해서 비교 표로 만들어줘
+`}
+/>
+
+#### 스크린샷 및 분석
+
+<Source
+  language="text"
+  code={`
+> 우리 웹사이트의 메인 페이지 스크린샷을 찍고 UI 개선점을 분석해줘
+
+> 모바일 뷰포트(375px)에서 반응형이 제대로 동작하는지 확인해줘
+`}
+/>
+
+#### E2E 테스트
+
+<Source
+  language="text"
+  code={`
+> 로그인 폼이 제대로 동작하는지 테스트해줘
+> - 유효한 자격 증명으로 로그인 시도
+> - 잘못된 비밀번호로 에러 메시지 확인
+> - 빈 필드 제출 시 유효성 검사 확인
+
+> 회원가입부터 첫 구매까지의 사용자 플로우를 테스트해줘
+`}
+/>
+
+### 실전 시나리오
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 시각적 회귀 테스트
+
+> 배포 전후의 주요 페이지 스크린샷을 비교하고,
+> 의도치 않은 UI 변경이 있는지 확인해줘
+
+# AI 작업 흐름:
+# 1. 스테이징 환경 스크린샷 촬영
+# 2. 프로덕션 환경 스크린샷 촬영
+# 3. 픽셀 단위 비교
+# 4. 차이점 리포트 생성
+`}
+/>
+
+---
+
+## 5. Slack - 팀 협업
+
+### Slack MCP란?
+
+**Slack MCP 서버**는 AI가 Slack 채널에 메시지를 보내고, 대화를 검색하며,
+팀 커뮤니케이션을 자동화할 수 있게 해줍니다.
+
+### 설정 방법
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-xxxxxxxxxxxx",
+        "SLACK_TEAM_ID": "T0XXXXXXXXX"
+      }
+    }
+  }
+}
+`}
+/>
+
+### 활용 예시
+
+<Source
+  language="text"
+  code={`
+> #dev-team 채널에 "배포 완료: v1.2.0 - 파워업 시스템 추가" 메시지를 보내줘
+
+> 이번 주 #bugs 채널에서 보고된 이슈들을 요약해줘
+
+> @frontend-team 에게 코드 리뷰 요청 메시지를 보내줘
+`}
+/>
+
+### 실전 시나리오
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 자동화된 배포 알림
+
+> 배포가 완료되면:
+> 1. 변경사항 요약을 생성하고
+> 2. #releases 채널에 릴리즈 노트 게시
+> 3. 관련 이슈 담당자들에게 DM으로 알림
+
+# AI가 GitHub + Slack MCP를 조합하여
+# 배포 프로세스 자동화
+`}
+/>
+
+---
+
+## 6. Database - PostgreSQL/SQLite
+
+### Database MCP란?
+
+**Database MCP 서버**는 AI가 데이터베이스에 직접 쿼리를 실행하고,
+스키마를 분석하며, 데이터 기반 의사결정을 지원합니다.
+
+### 설정 방법 (PostgreSQL)
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://user:pass@localhost:5432/mydb"
+      }
+    }
+  }
+}
+`}
+/>
+
+### 설정 방법 (SQLite)
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "--db-path",
+        "./data/game.db"
+      ]
+    }
+  }
+}
+`}
+/>
+
+### 활용 예시
+
+<Source
+  language="text"
+  code={`
+> 데이터베이스 스키마를 분석하고 ERD를 그려줘
+
+> 지난 달 가장 많이 플레이한 사용자 TOP 10을 조회해줘
+
+> users 테이블과 scores 테이블을 조인해서 사용자별 평균 점수를 계산해줘
+
+> 쿼리 성능이 느린 것 같은데, EXPLAIN ANALYZE 결과를 분석하고 인덱스를 제안해줘
+`}
+/>
+
+### 실전 시나리오
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 데이터 기반 기능 개선
+
+> 게임 데이터를 분석해서:
+> 1. 사용자들이 가장 많이 죽는 시점 파악
+> 2. 난이도 곡선 분석
+> 3. 밸런스 조정 제안
+
+# AI 작업 흐름:
+# 1. game_sessions 테이블에서 사망 데이터 조회
+# 2. 통계 분석 (평균, 중앙값, 분포)
+# 3. 시각화 및 인사이트 도출
+# 4. 구체적인 수치 조정 제안
+`}
+/>
+
+---
+
+## 7. Memory - 지식 그래프
+
+### Memory MCP란?
+
+**Memory MCP 서버**는 AI가 대화 간 정보를 기억하고,
+프로젝트에 대한 지식을 축적할 수 있게 해주는 **지식 그래프** 시스템입니다.
+
+### 설정 방법
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    }
+  }
+}
+`}
+/>
+
+### 활용 예시
+
+<Source
+  language="text"
+  code={`
+> 이 프로젝트의 아키텍처 결정 사항들을 기억해둬:
+> - MVC 패턴 사용
+> - raylib은 View 레이어에서만 사용
+> - 전역 변수 사용 금지
+
+> 지난번에 논의했던 파워업 시스템 설계를 다시 보여줘
+
+> 이 프로젝트에서 내가 선호하는 코딩 스타일을 요약해줘
+`}
+/>
+
+### 실전 시나리오
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 장기 프로젝트 컨텍스트 유지
+
+> 새로운 개발자가 프로젝트에 합류했어.
+> 지금까지의 아키텍처 결정, 코딩 컨벤션,
+> 주요 기술적 부채를 요약해서 온보딩 문서를 만들어줘
+
+# Memory MCP가 축적된 지식을 기반으로
+# 프로젝트 히스토리와 컨텍스트 제공
+`}
+/>
+
+---
+
+## MCP 서버 조합 활용
+
+### 여러 MCP 서버 동시 사용
+
+실제 개발에서는 여러 MCP 서버를 **조합하여** 복잡한 워크플로우를 자동화할 수 있습니다.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Workflow["통합 워크플로우"]
+        A["이슈 확인<br/>(GitHub)"] --> B["코드 수정"]
+        B --> C["테스트<br/>(Puppeteer)"]
+        C --> D["PR 생성<br/>(GitHub)"]
+        D --> E["팀 알림<br/>(Slack)"]
+    end
+`} />
+
+### 통합 설정 예시
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/context7-mcp"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "ghp_xxxx"
+      }
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-puppeteer"]
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-xxxx"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://..."
+      }
+    }
+  }
+}
+`}
+/>
+
+### 복합 시나리오 예시
+
+<Source
+  language="text"
+  code={`
+# 시나리오: 주간 개발 리포트 자동 생성
+
+> 이번 주 개발 현황을 정리해줘:
+> 1. GitHub에서 머지된 PR 목록과 변경사항 요약
+> 2. 해결된 이슈와 남은 이슈 현황
+> 3. 데이터베이스에서 이번 주 사용자 통계
+> 4. 결과를 #weekly-report 채널에 게시
+
+# AI가 GitHub + Database + Slack MCP를 조합하여
+# 자동으로 주간 리포트 생성 및 공유
+`}
+/>
+
+---
+
+## MCP 서버 선택 가이드
+
+| 작업 유형 | 추천 MCP 서버 |
+|----------|--------------|
+| 최신 라이브러리 문서 참조 | Context7 |
+| 코드 저장소 관리 | GitHub |
+| 디자인 → 코드 변환 | Figma |
+| E2E 테스트, 스크래핑 | Puppeteer/Playwright |
+| 팀 커뮤니케이션 자동화 | Slack |
+| 데이터 분석, 쿼리 | PostgreSQL/SQLite |
+| 장기 컨텍스트 유지 | Memory |
+| 파일 시스템 접근 | Filesystem |
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ede9fe',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **Context7** - AI가 오래된 정보 대신 최신 문서를 참조하도록 지원
+2. **GitHub** - 이슈, PR, 코드 리뷰 등 개발 워크플로우 자동화
+3. **Figma** - 디자인 파일에서 직접 코드 생성
+4. **Puppeteer** - 브라우저 자동화로 테스트 및 스크래핑
+5. **Slack** - 팀 커뮤니케이션과 알림 자동화
+6. **Database** - 데이터 기반 의사결정 지원
+7. **Memory** - 프로젝트 지식과 컨텍스트 축적
+8. **조합 활용** - 여러 MCP 서버를 연결하여 복잡한 워크플로우 구성
+
+</div>
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-09-mcp-9-1-mcp-소개-및-활용--docs"
+  prevTitle="9.1 MCP 소개 및 활용"
+  nextLink="?path=/docs/chapters-10-마무리-10-1-과정-정리--docs"
+  nextTitle="10.1 과정 정리"
+/>

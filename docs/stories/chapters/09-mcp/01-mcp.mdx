@@ -1,0 +1,375 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/09. MCP/9.1 MCP 소개 및 활용" />
+
+# 9.1 MCP (Model Context Protocol) 소개 및 활용
+
+---
+
+## MCP란?
+
+**MCP (Model Context Protocol)**는 Anthropic에서 개발한 **오픈 프로토콜**로,
+AI 모델이 외부 도구, 데이터 소스, 서비스에 안전하게 접근할 수 있게 해주는 표준입니다.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Client["MCP 클라이언트"]
+        Claude["Claude Code"]
+        Cursor["Cursor IDE"]
+    end
+
+    subgraph Server["MCP 서버"]
+        FS["파일시스템"]
+        DB["데이터베이스"]
+        API["외부 API"]
+        Browser["브라우저"]
+    end
+
+    Claude <-->|"MCP Protocol"| FS
+    Claude <-->|"MCP Protocol"| DB
+    Cursor <-->|"MCP Protocol"| API
+    Cursor <-->|"MCP Protocol"| Browser
+`} />
+
+---
+
+## 왜 MCP가 필요한가?
+
+| 문제 | MCP 해결책 |
+|------|-----------|
+| AI가 외부 데이터에 접근 불가 | 표준화된 방식으로 데이터 소스 연결 |
+| 도구마다 다른 통합 방식 | 단일 프로토콜로 모든 도구 연결 |
+| 보안 우려 | 권한 기반 접근 제어 |
+| 컨텍스트 제한 | 필요한 정보를 동적으로 제공 |
+
+### MCP의 핵심 개념
+
+<Mermaid chart={`
+flowchart TB
+    subgraph MCP["MCP 구성요소"]
+        Resources["📄 Resources<br/>데이터 소스"]
+        Tools["🔧 Tools<br/>실행 가능한 기능"]
+        Prompts["💬 Prompts<br/>프롬프트 템플릿"]
+    end
+
+    Resources --> |"파일, DB, API 응답"| AI["AI 모델"]
+    Tools --> |"검색, 실행, 생성"| AI
+    Prompts --> |"사전 정의된 워크플로우"| AI
+`} />
+
+| 구성요소 | 설명 | 예시 |
+|----------|------|------|
+| **Resources** | AI가 읽을 수 있는 데이터 | 파일 내용, DB 레코드, API 응답 |
+| **Tools** | AI가 실행할 수 있는 기능 | 파일 생성, 웹 검색, 쿼리 실행 |
+| **Prompts** | 미리 정의된 작업 템플릿 | 코드 리뷰, 문서 생성 워크플로우 |
+
+---
+
+## MCP 서버 종류
+
+### 공식 MCP 서버 (Anthropic 제공)
+
+| 서버 | 기능 |
+|------|------|
+| `@modelcontextprotocol/server-filesystem` | 파일시스템 접근 |
+| `@modelcontextprotocol/server-github` | GitHub 저장소 연동 |
+| `@modelcontextprotocol/server-postgres` | PostgreSQL 데이터베이스 |
+| `@modelcontextprotocol/server-sqlite` | SQLite 데이터베이스 |
+| `@modelcontextprotocol/server-memory` | 지식 그래프 메모리 |
+
+### 커뮤니티 MCP 서버
+
+| 서버 | 기능 |
+|------|------|
+| `mcp-server-fetch` | 웹 페이지 가져오기 |
+| `mcp-server-brave-search` | Brave 검색 엔진 |
+| `mcp-server-puppeteer` | 브라우저 자동화 |
+| `mcp-server-slack` | Slack 메시지 연동 |
+
+---
+
+## Claude Code에서 MCP 설정
+
+### 설정 파일 위치
+
+Claude Code의 MCP 설정은 `~/.claude.json` 파일에서 관리합니다.
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\\\git\\\\snake-game"
+      ]
+    }
+  }
+}
+`}
+/>
+
+### MCP 서버 추가 명령어
+
+Claude Code 내에서 직접 MCP 서버를 추가할 수 있습니다:
+
+<Source
+  language="text"
+  code={`
+> /mcp add filesystem
+# 또는 설정 파일 직접 편집
+> 설정 파일을 열어서 MCP 서버를 추가해줘
+`}
+/>
+
+---
+
+## Cursor에서 MCP 설정
+
+### 설정 방법
+
+1. `Ctrl + Shift + P` (또는 `Cmd + Shift + P`)로 명령 팔레트 열기
+2. "Cursor Settings" 검색 후 선택
+3. "MCP" 섹션에서 서버 추가
+
+### 설정 파일 예시
+
+Cursor의 MCP 설정은 `.cursor/mcp.json`에 저장됩니다:
+
+<Source
+  language="json"
+  code={`
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "your-github-token"
+      }
+    },
+    "browser": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/mcp-server-puppeteer"
+      ]
+    }
+  }
+}
+`}
+/>
+
+---
+
+## 실습: 파일시스템 MCP 서버 설정
+
+### 1단계: Node.js 설치 확인
+
+MCP 서버는 Node.js 환경에서 실행됩니다:
+
+<Source
+  language="bash"
+  code={`
+node --version
+# v18.x.x 이상 권장
+
+npm --version
+# 9.x.x 이상
+`}
+/>
+
+### 2단계: Claude Code에서 파일시스템 서버 활성화
+
+<Source
+  language="text"
+  code={`
+# Claude Code 실행 후
+> /mcp
+
+# 사용 가능한 MCP 서버 목록 확인
+# filesystem 서버가 없다면 추가
+
+> 프로젝트의 파일 목록을 MCP를 통해 가져와줘
+`}
+/>
+
+### 3단계: MCP 도구 사용 확인
+
+<Source
+  language="text"
+  code={`
+> src 폴더에 있는 모든 .c 파일을 찾아줘
+
+# MCP filesystem 서버가 활성화되어 있다면
+# AI가 직접 파일시스템에 접근하여 결과 반환
+`}
+/>
+
+---
+
+## MCP 활용 시나리오
+
+### 1. 데이터베이스 연동
+
+<Source
+  language="text"
+  code={`
+> 데이터베이스에서 최근 사용자 활동 로그를 조회해줘
+
+# MCP postgres/sqlite 서버를 통해
+# AI가 직접 쿼리를 실행하고 결과 분석
+`}
+/>
+
+### 2. GitHub 연동
+
+<Source
+  language="text"
+  code={`
+> 이 저장소의 열린 PR 목록을 보여줘
+
+> #123 이슈에 코멘트를 달아줘
+
+# MCP github 서버를 통해
+# GitHub API와 직접 상호작용
+`}
+/>
+
+### 3. 웹 브라우저 자동화
+
+<Source
+  language="text"
+  code={`
+> 이 웹페이지의 스크린샷을 찍어줘
+
+> 로그인 폼을 자동으로 테스트해줘
+
+# MCP puppeteer 서버를 통해
+# 브라우저 자동화 수행
+`}
+/>
+
+---
+
+## MCP 보안 고려사항
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+### 보안 주의사항
+
+1. **민감한 정보 노출 주의**
+   - API 키, 토큰은 환경 변수로 관리
+   - `.claude.json`을 `.gitignore`에 추가
+
+2. **권한 최소화 원칙**
+   - 필요한 디렉토리만 접근 허용
+   - 읽기 전용 모드 우선 사용
+
+3. **신뢰할 수 있는 서버만 사용**
+   - 공식 또는 검증된 MCP 서버 사용
+   - 커뮤니티 서버는 코드 검토 후 사용
+
+</div>
+
+---
+
+## MCP 아키텍처 이해
+
+<Mermaid chart={`
+sequenceDiagram
+    participant User as 사용자
+    participant Client as Claude/Cursor
+    participant MCP as MCP 서버
+    participant Resource as 외부 리소스
+
+    User->>Client: "DB에서 사용자 조회해줘"
+    Client->>MCP: Tool 호출 요청
+    MCP->>Resource: 데이터베이스 쿼리
+    Resource-->>MCP: 쿼리 결과
+    MCP-->>Client: 결과 반환
+    Client-->>User: 결과 분석 및 응답
+`} />
+
+### 통신 흐름
+
+1. **사용자 요청**: 자연어로 작업 요청
+2. **도구 선택**: AI가 적절한 MCP 도구 선택
+3. **서버 호출**: MCP 프로토콜로 서버에 요청
+4. **리소스 접근**: 서버가 외부 리소스에 접근
+5. **결과 반환**: 결과를 AI에게 전달
+6. **응답 생성**: AI가 결과를 분석하여 사용자에게 응답
+
+---
+
+## 트러블슈팅
+
+### 일반적인 문제와 해결책
+
+| 문제 | 원인 | 해결책 |
+|------|------|--------|
+| MCP 서버 연결 실패 | Node.js 미설치 | Node.js 18+ 설치 |
+| 권한 오류 | 파일 접근 권한 부족 | 허용 경로 확인 |
+| 서버 시작 실패 | 포트 충돌 | 다른 MCP 인스턴스 종료 |
+| 환경 변수 인식 불가 | 설정 오류 | `env` 섹션 확인 |
+
+### 디버깅 명령어
+
+<Source
+  language="bash"
+  code={`
+# Claude Code에서 MCP 상태 확인
+> /mcp
+
+# MCP 서버 로그 확인 (수동 실행 시)
+npx -y @modelcontextprotocol/server-filesystem /path/to/dir
+`}
+/>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ede9fe',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **MCP** - AI가 외부 도구/데이터에 접근하는 표준 프로토콜
+2. **3가지 구성요소** - Resources(데이터), Tools(기능), Prompts(템플릿)
+3. **설정 파일** - Claude Code는 `~/.claude.json`, Cursor는 `.cursor/mcp.json`
+4. **보안** - 최소 권한 원칙, 민감 정보는 환경 변수로 관리
+5. **활용** - 파일시스템, 데이터베이스, GitHub, 브라우저 자동화 등
+
+</div>
+
+---
+
+## 추가 리소스
+
+- **MCP 공식 문서**: [https://modelcontextprotocol.io](https://modelcontextprotocol.io)
+- **MCP 서버 목록**: [https://github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)
+- **Anthropic MCP 발표**: [https://www.anthropic.com/news/model-context-protocol](https://www.anthropic.com/news/model-context-protocol)
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-08-실전-프로젝트-8-1-snake-game-완성--docs"
+  prevTitle="8.1 Snake Game 완성"
+  nextLink="?path=/docs/chapters-10-마무리-10-1-과정-정리--docs"
+  nextTitle="10.1 과정 정리"
+/>
