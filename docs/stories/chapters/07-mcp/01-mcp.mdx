@@ -3,16 +3,20 @@ import { Placeholder } from '../../../components/Placeholder';
 import { ChapterNav } from '../../../components/ChapterNav';
 import { Mermaid } from '../../../components/Mermaid';
 
-<Meta title="Chapters/09. MCP/9.1 MCP 소개 및 활용" />
+<Meta title="Chapters/07. MCP/7.1 MCP 소개 및 활용" />
 
-# 9.1 MCP (Model Context Protocol) 소개 및 활용
+# 7.1 MCP (Model Context Protocol) 소개 및 활용
 
 ---
 
 ## MCP란?
 
-**MCP (Model Context Protocol)**는 Anthropic에서 개발한 **오픈 프로토콜**로,
+![](MCP.png)
+**MCP (Model Context Protocol)** 는 Anthropic에서 개발한 **오픈 프로토콜**로,
 AI 모델이 외부 도구, 데이터 소스, 서비스에 안전하게 접근할 수 있게 해주는 표준입니다.
+
+
+> https://github.com/mcp 를 방문해보세요!
 
 <Mermaid chart={`
 flowchart LR
@@ -368,8 +372,8 @@ npx -y @modelcontextprotocol/server-filesystem /path/to/dir
 - **Anthropic MCP 발표**: [https://www.anthropic.com/news/model-context-protocol](https://www.anthropic.com/news/model-context-protocol)
 
 <ChapterNav
-  prevLink="?path=/docs/chapters-08-실전-프로젝트-8-1-snake-game-완성--docs"
-  prevTitle="8.1 Snake Game 완성"
-  nextLink="?path=/docs/chapters-10-마무리-10-1-과정-정리--docs"
-  nextTitle="10.1 과정 정리"
+  prevLink="?path=/docs/chapters-06-subagent-skills-6-2-agent-skills--docs"
+  prevTitle="6.2 Agent Skills"
+  nextLink="?path=/docs/chapters-07-mcp-7-2-mcp-실전-활용-사례--docs"
+  nextTitle="7.2 MCP 실전 활용 사례"
 />

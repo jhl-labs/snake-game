@@ -1,0 +1,513 @@
+import { Meta, Source } from '@storybook/blocks';
+import { Placeholder } from '../../../components/Placeholder';
+import { ChapterNav } from '../../../components/ChapterNav';
+import { Mermaid } from '../../../components/Mermaid';
+
+<Meta title="Chapters/08. GitHub Actions/8.1 Claude Code Action 소개" />
+
+# 8.1 Claude Code Action 소개
+
+---
+
+## Claude Code Action이란?
+
+**Claude Code Action**은 GitHub PR과 이슈에서 Claude를 활용할 수 있는 **공식 GitHub Action**입니다.
+`@claude` 멘션으로 코드 리뷰, 질문 답변, 코드 구현까지 자동화할 수 있습니다.
+
+> 공식 저장소: [https://github.com/anthropics/claude-code-action](https://github.com/anthropics/claude-code-action)
+
+<Mermaid chart={`
+flowchart LR
+    subgraph GitHub["GitHub"]
+        PR["PR/Issue"]
+        Comment["@claude 멘션"]
+        Action["GitHub Action"]
+    end
+
+    subgraph Claude["Claude Code"]
+        Review["코드 리뷰"]
+        QA["질문 답변"]
+        Impl["코드 구현"]
+    end
+
+    Comment --> Action
+    Action --> Review
+    Action --> QA
+    Action --> Impl
+    Review --> PR
+    QA --> PR
+    Impl --> PR
+`} />
+
+---
+
+## 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| **🎯 지능형 모드 감지** | 워크플로우 컨텍스트에 따라 자동으로 실행 모드 선택 |
+| **🤖 대화형 코드 어시스턴트** | 코드, 아키텍처, 프로그래밍에 대한 질문 답변 |
+| **🔍 코드 리뷰** | PR 변경사항 분석 및 개선 제안 |
+| **✨ 코드 구현** | 간단한 수정, 리팩토링, 새 기능 구현 |
+| **💬 PR/Issue 통합** | GitHub 코멘트 및 PR 리뷰와 원활한 연동 |
+| **📋 진행 상황 추적** | 체크박스로 작업 진행 상황 시각화 |
+| **🏃 자체 인프라 실행** | GitHub Runner에서 실행, API 호출만 외부로 |
+
+---
+
+## 빠른 시작 (Quickstart)
+
+### 방법 1: Claude Code CLI로 설치 (권장)
+
+터미널에서 Claude Code를 실행하고 다음 명령어를 입력합니다:
+
+<Source
+  language="bash"
+  code={`
+claude
+# Claude Code 실행 후
+> /install-github-app
+`}
+/>
+
+이 명령어가 GitHub App 설정과 필요한 시크릿 구성을 안내합니다.
+
+> **참고**: 저장소 관리자 권한이 필요합니다.
+
+### 방법 2: 수동 설정
+
+#### 1단계: GitHub App 설치
+
+1. [Claude Code GitHub App](https://github.com/apps/claude) 페이지 방문
+2. "Install" 버튼 클릭
+3. 대상 저장소 선택
+
+#### 2단계: API 키 설정
+
+저장소 Settings > Secrets and variables > Actions에서 시크릿 추가:
+
+<Source
+  language="text"
+  code={`
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx
+`}
+/>
+
+#### 3단계: 워크플로우 파일 생성
+
+`.github/workflows/claude.yml` 파일 생성:
+
+<Source
+  language="yaml"
+  code={`
+name: Claude Code Action
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    # @claude 멘션이 있거나 이슈가 할당되었을 때 실행
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && github.event.action == 'assigned' && github.event.assignee.login == 'claude[bot]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Run Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: \${{ secrets.ANTHROPIC_API_KEY }}
+`}
+/>
+
+---
+
+## 사용 방법
+
+### PR에서 코드 리뷰 요청
+
+<Source
+  language="text"
+  code={`
+@claude 이 PR의 변경사항을 리뷰해줘.
+특히 성능과 보안 측면에서 확인해줘.
+`}
+/>
+
+### 코드에 대한 질문
+
+<Source
+  language="text"
+  code={`
+@claude 이 함수가 어떻게 동작하는지 설명해줘.
+snake_move() 함수의 충돌 감지 로직이 이해가 안 돼.
+`}
+/>
+
+### 코드 수정 요청
+
+<Source
+  language="text"
+  code={`
+@claude 이 버그를 수정해줘.
+뱀이 벽을 통과하는 문제가 있어.
+`}
+/>
+
+### 새 기능 구현 요청
+
+<Source
+  language="text"
+  code={`
+@claude 파워업 시스템을 추가해줘.
+- 속도 증가 파워업
+- 점수 2배 파워업
+- 무적 파워업
+`}
+/>
+
+---
+
+## 워크플로우 설정 옵션
+
+### 기본 입력 파라미터
+
+| 파라미터 | 설명 | 필수 |
+|----------|------|------|
+| `anthropic_api_key` | Anthropic API 키 | ✅ |
+| `prompt` | Claude에게 전달할 프롬프트 | ❌ |
+| `claude_args` | Claude Code CLI 추가 인수 | ❌ |
+| `model` | 사용할 모델 (기본: claude-sonnet-4-20250514) | ❌ |
+| `timeout_minutes` | 실행 타임아웃 (기본: 30) | ❌ |
+
+### 고급 설정 예시
+
+<Source
+  language="yaml"
+  code={`
+- name: Run Claude
+  uses: anthropics/claude-code-action@v1
+  with:
+    anthropic_api_key: \${{ secrets.ANTHROPIC_API_KEY }}
+    model: claude-sonnet-4-20250514
+    timeout_minutes: 60
+    prompt: |
+      이 저장소는 C 언어로 작성된 Snake 게임입니다.
+      코드 리뷰 시 다음 사항을 확인해주세요:
+      - 메모리 누수
+      - NULL 포인터 체크
+      - 코딩 컨벤션 준수
+`}
+/>
+
+---
+
+## 클라우드 제공자 설정
+
+### AWS Bedrock
+
+<Source
+  language="yaml"
+  code={`
+- name: Run Claude (Bedrock)
+  uses: anthropics/claude-code-action@v1
+  with:
+    use_bedrock: true
+    aws_access_key_id: \${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws_secret_access_key: \${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    aws_region: us-east-1
+`}
+/>
+
+### Google Vertex AI
+
+<Source
+  language="yaml"
+  code={`
+- name: Run Claude (Vertex AI)
+  uses: anthropics/claude-code-action@v1
+  with:
+    use_vertex: true
+    gcp_project_id: \${{ secrets.GCP_PROJECT_ID }}
+    gcp_region: us-central1
+    gcp_credentials: \${{ secrets.GCP_CREDENTIALS }}
+`}
+/>
+
+---
+
+## 실전 활용 사례
+
+### 1. 자동 PR 코드 리뷰
+
+PR이 열릴 때마다 자동으로 코드 리뷰를 수행합니다:
+
+<Source
+  language="yaml"
+  code={`
+name: Auto PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Claude PR Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: \${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            이 PR의 변경사항을 리뷰해주세요.
+            
+            다음 항목을 확인해주세요:
+            - 코드 품질 및 가독성
+            - 잠재적 버그
+            - 성능 이슈
+            - 보안 취약점
+            
+            개선이 필요한 부분은 구체적인 코드 예시와 함께 제안해주세요.
+`}
+/>
+
+### 2. 특정 파일 변경 시 리뷰
+
+보안에 민감한 파일이 변경되었을 때만 리뷰를 실행합니다:
+
+<Source
+  language="yaml"
+  code={`
+name: Security Review
+
+on:
+  pull_request:
+    paths:
+      - 'src/auth/**'
+      - 'src/security/**'
+      - '**/*password*'
+      - '**/*secret*'
+
+jobs:
+  security-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Security Analysis
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: \${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            보안 관점에서 이 변경사항을 분석해주세요.
+            
+            확인 사항:
+            - 인증/인가 로직의 취약점
+            - 민감 정보 노출 가능성
+            - 입력 검증 누락
+            - OWASP Top 10 관련 이슈
+`}
+/>
+
+### 3. 이슈 자동 분류
+
+새 이슈가 생성되면 자동으로 라벨을 추가합니다:
+
+<Source
+  language="yaml"
+  code={`
+name: Issue Triage
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Analyze and Label Issue
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: \${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            이 이슈를 분석하고 적절한 라벨을 추가해주세요.
+            
+            가능한 라벨:
+            - bug: 버그 리포트
+            - feature: 새 기능 요청
+            - documentation: 문서 관련
+            - question: 질문
+            - enhancement: 개선 사항
+            
+            우선순위도 판단해주세요:
+            - priority:high
+            - priority:medium
+            - priority:low
+`}
+/>
+
+### 4. 문서 자동 업데이트
+
+코드 변경 시 관련 문서를 자동으로 업데이트합니다:
+
+<Source
+  language="yaml"
+  code={`
+name: Documentation Sync
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'src/**/*.c'
+      - 'src/**/*.h'
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Update Documentation
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: \${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            변경된 코드를 분석하고 관련 문서를 업데이트해주세요.
+            
+            확인할 문서:
+            - README.md의 API 설명
+            - docs/ 폴더의 관련 문서
+            - 함수 주석 (Doxygen 스타일)
+            
+            문서가 코드와 동기화되지 않은 부분이 있다면 수정해주세요.
+`}
+/>
+
+---
+
+## 시각적 예시
+
+실제 GitHub에서 Claude Code Action이 동작하는 모습입니다:
+
+![](020-github-actions-01.png)
+
+---
+
+![](020-github-actions-05.png)
+
+---
+
+![](020-github-actions-06.png)
+
+---
+
+![](020-github-actions-07.png)
+
+---
+
+![](020-github-actions-08.png)
+
+---
+
+![](020-github-actions-09.png)
+
+---
+
+![](020-github-actions-10.png)
+
+---
+
+![](019-release-02.png)
+
+---
+
+![](020-github-actions-11.png)
+
+---
+
+## 제한 사항 및 주의사항
+
+<div style={{
+  backgroundColor: '#fef3c7',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+### 주의사항
+
+1. **API 비용**
+   - 각 실행마다 API 호출 비용 발생
+   - 대용량 PR은 토큰 사용량이 많을 수 있음
+
+2. **실행 시간**
+   - 기본 타임아웃: 30분
+   - 복잡한 작업은 시간이 오래 걸릴 수 있음
+
+3. **권한 설정**
+   - 적절한 권한 설정 필수
+   - 민감한 저장소에서는 신중하게 사용
+
+4. **코드 변경**
+   - Claude가 직접 코드를 수정할 수 있음
+   - 중요한 브랜치에는 보호 규칙 설정 권장
+
+</div>
+
+---
+
+## 핵심 정리
+
+<div style={{
+  backgroundColor: '#ede9fe',
+  padding: '1rem',
+  borderRadius: '8px',
+  marginTop: '1.5rem'
+}}>
+
+1. **Claude Code Action** - GitHub PR/Issue에서 `@claude` 멘션으로 AI 활용
+2. **빠른 시작** - `/install-github-app` 명령으로 간편 설치
+3. **다양한 기능** - 코드 리뷰, 질문 답변, 코드 구현, 버그 수정
+4. **자동화** - PR 생성 시 자동 리뷰, 이슈 분류, 문서 동기화
+5. **클라우드 지원** - Anthropic API, AWS Bedrock, Google Vertex AI
+
+</div>
+
+---
+
+## 추가 리소스
+
+- **공식 저장소**: [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action)
+- **설정 가이드**: [Setup Guide](https://github.com/anthropics/claude-code-action/blob/main/docs/setup.md)
+- **활용 사례**: [Solutions Guide](https://github.com/anthropics/claude-code-action/blob/main/docs/solutions.md)
+- **FAQ**: [Frequently Asked Questions](https://github.com/anthropics/claude-code-action/blob/main/docs/faq.md)
+
+<ChapterNav
+  prevLink="?path=/docs/chapters-07-mcp-7-2-mcp-실전-활용-사례--docs"
+  prevTitle="7.2 MCP 실전 활용 사례"
+  nextLink="?path=/docs/chapters-08-github-actions-8-2-실전-워크플로우--docs"
+  nextTitle="8.2 실전 워크플로우"
+/>
