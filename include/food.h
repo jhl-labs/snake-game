@@ -46,10 +46,21 @@ bool food_is_active(const Food* p_food);
 
 /**
  * 음식을 비활성화합니다.
- * 
+ *
  * @param p_food 음식 객체 포인터
  */
 void food_deactivate(Food* p_food);
+
+/**
+ * 음식을 랜덤한 위치에 생성합니다 (2인용 모드).
+ * 두 뱀의 몸과 겹치지 않는 위치를 선택합니다.
+ *
+ * @param p_food 음식 객체 포인터
+ * @param p_snake1 P1 뱀 객체 포인터
+ * @param p_snake2 P2 뱀 객체 포인터
+ * @return 생성 성공 여부
+ */
+bool food_spawn_versus(Food* p_food, const Snake* p_snake1, const Snake* p_snake2);
 
 #endif // SNAKE_GAME_FOOD_H
 

@@ -56,6 +56,21 @@ static const Color COLOR_LIGHTGRAY = {
     200, 200, 200, 255
 };
 
+// P2 색상 (파랑색)
+static const Color COLOR_SNAKE2 = {
+    COLOR_SNAKE2_R,
+    COLOR_SNAKE2_G,
+    COLOR_SNAKE2_B,
+    COLOR_SNAKE2_A
+};
+
+static const Color COLOR_SNAKE2_HEAD = {
+    COLOR_SNAKE2_R,
+    COLOR_SNAKE2_G_HEAD,
+    COLOR_SNAKE2_B,
+    COLOR_SNAKE2_A
+};
+
 // 그리드 오프셋 계산 (화면 중앙에 배치)
 static int calculate_grid_offset_x(void) {
     return (SCREEN_WIDTH - (GRID_WIDTH * CELL_SIZE)) / 2;
@@ -111,8 +126,8 @@ static void draw_grid(void) {
     }
 }
 
-// 뱀 그리기
-static void draw_snake(const Snake* p_snake) {
+// 뱀 그리기 (색상 지정)
+static void draw_snake_with_color(const Snake* p_snake, Color body_color, Color head_color) {
     if (p_snake == NULL || p_snake->p_body == NULL || p_snake->length == 0) {
         return;
     }
@@ -126,11 +141,21 @@ static void draw_snake(const Snake* p_snake) {
         int screen_y = offset_y + pos.y * CELL_SIZE;
 
         // 머리는 다른 색상
-        Color color = (i == 0) ? COLOR_SNAKE_HEAD : COLOR_SNAKE;
+        Color color = (i == 0) ? head_color : body_color;
 
-        DrawRectangle(screen_x + 1, screen_y + 1, 
+        DrawRectangle(screen_x + 1, screen_y + 1,
                       CELL_SIZE - 2, CELL_SIZE - 2, color);
     }
+}
+
+// P1 뱀 그리기
+static void draw_snake(const Snake* p_snake) {
+    draw_snake_with_color(p_snake, COLOR_SNAKE, COLOR_SNAKE_HEAD);
+}
+
+// P2 뱀 그리기
+static void draw_snake_p2(const Snake* p_snake) {
+    draw_snake_with_color(p_snake, COLOR_SNAKE2, COLOR_SNAKE2_HEAD);
 }
 
 // 음식 그리기
@@ -150,16 +175,31 @@ static void draw_food(const Food* p_food) {
                   CELL_SIZE - 4, CELL_SIZE - 4, COLOR_FOOD);
 }
 
-// 점수 표시
+// 점수 표시 (1인용)
 static void draw_score(uint32_t score) {
     char score_text[32];
     snprintf(score_text, sizeof(score_text), "Score: %u", score);
-    
+
     int text_width = MeasureText(score_text, 20);
     int pos_x = (SCREEN_WIDTH - text_width) / 2;
     int pos_y = 10;
 
     DrawText(score_text, pos_x, pos_y, 20, COLOR_TEXT);
+}
+
+// 점수 표시 (2인용)
+static void draw_score_versus(uint32_t score1, uint32_t score2) {
+    char p1_text[32];
+    char p2_text[32];
+    snprintf(p1_text, sizeof(p1_text), "P1: %u", score1);
+    snprintf(p2_text, sizeof(p2_text), "P2: %u", score2);
+
+    // P1 점수 (왼쪽, 초록색)
+    DrawText(p1_text, 20, 10, 20, COLOR_SNAKE);
+
+    // P2 점수 (오른쪽, 파랑색)
+    int p2_width = MeasureText(p2_text, 20);
+    DrawText(p2_text, SCREEN_WIDTH - p2_width - 20, 10, 20, COLOR_SNAKE2);
 }
 
 void renderer_draw_game(const Game* p_game) {
@@ -175,11 +215,16 @@ void renderer_draw_game(const Game* p_game) {
     // 음식
     draw_food(game_get_food(p_game));
 
-    // 뱀
+    // P1 뱀
     draw_snake(game_get_snake(p_game));
 
-    // 점수
-    draw_score(game_get_score(p_game));
+    // P2 뱀 (2인용 모드)
+    if (game_get_mode(p_game) == GAME_MODE_VERSUS) {
+        draw_snake_p2(game_get_snake_p2(p_game));
+        draw_score_versus(game_get_score(p_game), game_get_score_p2(p_game));
+    } else {
+        draw_score(game_get_score(p_game));
+    }
 }
 
 void renderer_draw_game_over(const Game* p_game) {
@@ -191,7 +236,7 @@ void renderer_draw_game_over(const Game* p_game) {
     renderer_draw_game(p_game);
 
     // 반투명 오버레이
-    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                   (Color){0, 0, 0, 180});
 
     // 게임 오버 텍스트
@@ -199,30 +244,76 @@ void renderer_draw_game_over(const Game* p_game) {
     int text_size = 40;
     int text_width = MeasureText(game_over_text, text_size);
     int text_x = (SCREEN_WIDTH - text_width) / 2;
-    int text_y = SCREEN_HEIGHT / 2 - 60;
+    int text_y = SCREEN_HEIGHT / 2 - 80;
 
     DrawText(game_over_text, text_x, text_y, text_size, COLOR_TEXT);
 
-    // 점수 표시
-    char score_text[64];
-    snprintf(score_text, sizeof(score_text), "Final Score: %u", 
-             game_get_score(p_game));
-    int score_text_size = 24;
-    int score_text_width = MeasureText(score_text, score_text_size);
-    int score_text_x = (SCREEN_WIDTH - score_text_width) / 2;
-    int score_text_y = text_y + 60;
+    if (game_get_mode(p_game) == GAME_MODE_VERSUS) {
+        // 2인용 모드: 승패 결과 표시
+        GameResult result = game_get_result(p_game);
+        const char* result_text;
+        Color result_color;
 
-    DrawText(score_text, score_text_x, score_text_y, 
-             score_text_size, COLOR_TEXT);
+        switch (result) {
+            case GAME_RESULT_P1_WIN:
+                result_text = "Player 1 Wins!";
+                result_color = COLOR_SNAKE;
+                break;
+            case GAME_RESULT_P2_WIN:
+                result_text = "Player 2 Wins!";
+                result_color = COLOR_SNAKE2;
+                break;
+            case GAME_RESULT_DRAW:
+                result_text = "Draw!";
+                result_color = COLOR_TEXT;
+                break;
+            default:
+                result_text = "";
+                result_color = COLOR_TEXT;
+        }
 
-    // 재시작 안내
-    const char* restart_text = "Press R to Restart or ESC to Quit";
-    int restart_text_size = 20;
-    int restart_text_width = MeasureText(restart_text, restart_text_size);
-    int restart_text_x = (SCREEN_WIDTH - restart_text_width) / 2;
-    int restart_text_y = score_text_y + 50;
+        int result_width = MeasureText(result_text, 32);
+        int result_x = (SCREEN_WIDTH - result_width) / 2;
+        int result_y = text_y + 50;
+        DrawText(result_text, result_x, result_y, 32, result_color);
 
-    DrawText(restart_text, restart_text_x, restart_text_y, 
-             restart_text_size, COLOR_LIGHTGRAY);
+        // 점수 표시
+        char score_text[64];
+        snprintf(score_text, sizeof(score_text), "P1: %u  -  P2: %u",
+                 game_get_score(p_game), game_get_score_p2(p_game));
+        int score_width = MeasureText(score_text, 24);
+        int score_x = (SCREEN_WIDTH - score_width) / 2;
+        int score_y = result_y + 50;
+        DrawText(score_text, score_x, score_y, 24, COLOR_TEXT);
+
+        // 재시작 안내
+        const char* restart_text = "Press R to Restart or ESC to Quit";
+        int restart_width = MeasureText(restart_text, 20);
+        int restart_x = (SCREEN_WIDTH - restart_width) / 2;
+        int restart_y = score_y + 50;
+        DrawText(restart_text, restart_x, restart_y, 20, COLOR_LIGHTGRAY);
+    } else {
+        // 1인용 모드: 기존 점수 표시
+        char score_text[64];
+        snprintf(score_text, sizeof(score_text), "Final Score: %u",
+                 game_get_score(p_game));
+        int score_text_size = 24;
+        int score_text_width = MeasureText(score_text, score_text_size);
+        int score_text_x = (SCREEN_WIDTH - score_text_width) / 2;
+        int score_text_y = text_y + 60;
+
+        DrawText(score_text, score_text_x, score_text_y,
+                 score_text_size, COLOR_TEXT);
+
+        // 재시작 안내
+        const char* restart_text = "Press R to Restart or ESC to Quit";
+        int restart_text_size = 20;
+        int restart_text_width = MeasureText(restart_text, restart_text_size);
+        int restart_text_x = (SCREEN_WIDTH - restart_text_width) / 2;
+        int restart_text_y = score_text_y + 50;
+
+        DrawText(restart_text, restart_text_x, restart_text_y,
+                 restart_text_size, COLOR_LIGHTGRAY);
+    }
 }
 
