@@ -30,8 +30,8 @@ flowchart LR
 
 ## 실습 환경
 
-프로젝트에 `exercises/buggy_snake.c` 파일이 준비되어 있습니다.
-**의도적으로 삽입된 7개의 버그**가 있습니다.
+프로젝트에 `exercises/basics/buggy_snake.c` 파일이 준비되어 있습니다.
+**의도적으로 삽입된 6개의 버그**가 있습니다.
 
 ![](018-bug-01.png)
 
@@ -47,10 +47,10 @@ agent에게 정답지를 알려주면 안되니깐요
 
 <ExerciseCard
   number={1}
-  title="NULL 포인터 체크 누락"
+  title="배열 경계 체크 누락"
   difficulty="초급"
-  description="snake_init 함수에서 NULL 체크가 누락되어 있습니다."
-  hint="함수 시작 부분을 확인하세요"
+  description="snake_grow 함수에서 MAX_SNAKE_LENGTH를 초과할 때의 처리가 없습니다."
+  hint="length 증가 전에 경계 조건을 확인하세요"
 />
 
 ### 버그 있는 코드
@@ -58,13 +58,17 @@ agent에게 정답지를 알려주면 안되니깐요
 <Source
   language="c"
   code={`
-// BUG #1: NULL 포인터 체크 누락
-bool snake_init(Snake* p_snake, int start_x, int start_y) {
-    // 여기에 NULL 체크가 없음!
-    p_snake->body[0].x = start_x;
-    p_snake->body[0].y = start_y;
-    p_snake->length = 1;
-    p_snake->direction = DIRECTION_RIGHT;
+// BUG #1: 배열 경계 체크 누락
+bool snake_grow(Snake* p_snake) {
+    if (p_snake == NULL) {
+        return false;
+    }
+
+    p_snake->length++;  // MAX_SNAKE_LENGTH 체크 없음!
+
+    int last_idx = p_snake->length - 1;
+    p_snake->body[last_idx] = p_snake->body[last_idx - 1];
+
     return true;
 }
 `}
@@ -75,9 +79,9 @@ bool snake_init(Snake* p_snake, int start_x, int start_y) {
 <Source
   language="text"
   code={`
-exercises/buggy_snake.c의 snake_init 함수에
-NULL 포인터가 전달되면 크래시가 발생해.
-NULL 체크를 추가해서 수정해줘.
+exercises/basics/buggy_snake.c의 snake_grow 함수에서
+뱀 길이가 MAX_SNAKE_LENGTH를 초과할 때
+배열 오버플로우가 발생해. 이 버그를 수정해줘.
 `}
 />
 
@@ -170,7 +174,7 @@ void snake_set_direction(Snake* p_snake, Direction new_dir) {
 <Source
   language="text"
   code={`
-> exercises/buggy_snake.c 파일에 여러 버그가 있어.
+> exercises/basics/buggy_snake.c 파일에 여러 버그가 있어.
 > 파일 전체를 분석해서 모든 버그를 찾아 수정해줘.
 >
 > 확인할 항목:
@@ -211,31 +215,29 @@ make test
 
 <Mermaid chart={`
 flowchart TB
-    subgraph BugTypes["7가지 버그 유형"]
-        Null["1️⃣ NULL 체크<br/>(초급)"]
-        Array["2️⃣ 배열 경계<br/>(초급)"]
-        Logic["3️⃣ 로직 오류<br/>(중급)"]
-        Memory["4️⃣ 메모리 누수<br/>(중급)"]
-        Init["5️⃣ 초기화 오류<br/>(초급)"]
-        Return["6️⃣ 반환값 미확인<br/>(중급)"]
-        Race["7️⃣ 경쟁 조건<br/>(고급)"]
+    subgraph BugTypes["6가지 버그 유형"]
+        Array["1️⃣ 배열 경계<br/>(초급)"]
+        Wall["2️⃣ 경계 조건<br/>(초급)"]
+        Memory["3️⃣ 메모리 누수<br/>(초급)"]
+        Direction["4️⃣ 방향 로직<br/>(중급)"]
+        Collision["5️⃣ 충돌 체크<br/>(중급)"]
+        Logic["6️⃣ 방향 전환<br/>(중급)"]
     end
 
-    Null --> Array --> Init
-    Logic --> Memory --> Return --> Race
+    Array --> Wall --> Memory
+    Direction --> Collision --> Logic
 `} />
 
 ## 버그 목록 체크리스트
 
 | # | 버그 | 난이도 | 수정 완료 |
 |---|------|--------|----------|
-| 1 | NULL 포인터 체크 누락 | 초급 | ☐ |
-| 2 | 배열 경계 체크 누락 | 초급 | ☐ |
-| 3 | 반대 방향 전환 가능 | 중급 | ☐ |
-| 4 | 메모리 해제 누락 | 중급 | ☐ |
-| 5 | 초기화 값 오류 | 초급 | ☐ |
-| 6 | 반환값 미확인 | 중급 | ☐ |
-| 7 | 경쟁 조건 | 고급 | ☐ |
+| 1 | 배열 경계 체크 누락 (snake_grow) | 초급 | ☐ |
+| 2 | 벽 충돌 경계 조건 오류 (is_wall_collision) | 초급 | ☐ |
+| 3 | 메모리 해제 누락 (get_direction_name) | 초급 | ☐ |
+| 4 | 방향 이동 로직 오류 (snake_move - LEFT) | 중급 | ☐ |
+| 5 | 자기 충돌 체크 시작 인덱스 오류 (is_self_collision) | 중급 | ☐ |
+| 6 | 반대 방향 전환 체크 없음 (snake_set_direction) | 중급 | ☐ |
 
 ---
 

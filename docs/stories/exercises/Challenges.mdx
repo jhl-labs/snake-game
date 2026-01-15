@@ -16,131 +16,233 @@ import { ExerciseCard } from '../../components/ExerciseCard';
   title="점수 시스템 추가"
   difficulty="초급"
   description="음식을 먹을 때마다 점수가 증가하는 시스템을 구현합니다."
-  hint="Game 구조체에 score 필드를 추가하세요"
+  hint="game.h에 점수를 저장할 변수를 추가하고, 음식을 먹을 때 점수가 증가하도록 해줘"
 />
 
-### 요청 예시
+### 요구사항
+- 음식을 먹을 때마다 10점 추가
+- 현재 점수를 화면에 표시
+- 게임 오버 시 최종 점수 표시
 
-<Source
-  language="text"
-  code={`
-> 게임에 점수 시스템을 추가해줘.
-> 음식을 먹으면 10점씩 증가하고,
-> 현재 점수를 화면에 표시해줘.
-`}
-/>
+### 예상 변경 파일
+- `include/game.h` - 점수 변수 추가
+- `src/game.c` - 점수 로직 추가
+- `src/renderer.c` - 점수 표시
 
 ---
 
 <ExerciseCard
   number={2}
-  title="게임 재시작 기능"
+  title="게임 속도 조절"
   difficulty="초급"
-  description="게임 오버 후 R 키를 누르면 재시작되는 기능을 구현합니다."
-  hint="game_reset 함수를 만들고 main.c에서 호출하세요"
+  description="게임 속도를 조절하는 기능을 추가합니다."
+  hint="점수가 50점 올라갈 때마다 속도가 10% 빨라지게 해줘"
 />
 
-### 요청 예시
+### 요구사항
+- 기본 속도 설정
+- 점수가 높아질수록 속도 증가
+- 최대 속도 제한
 
-<Source
-  language="text"
-  code={`
-> 게임 오버 상태에서 R 키를 누르면
-> 게임이 처음부터 다시 시작되도록 해줘.
-`}
+---
+
+<ExerciseCard
+  number={3}
+  title="색상 변경"
+  difficulty="초급"
+  description="뱀의 색상을 변경합니다."
+  hint="renderer.c에서 뱀의 머리는 노란색, 몸통은 초록색으로 변경해줘"
 />
+
+### 요구사항
+- 뱀 머리와 몸통 색상 구분
+- 음식 색상 변경
+- 배경 색상 설정
 
 ---
 
 ## 중급 도전
 
 <ExerciseCard
-  number={3}
-  title="난이도 시스템"
-  difficulty="중급"
-  description="뱀 길이에 따라 게임 속도가 빨라지는 난이도 시스템을 구현합니다."
-  hint="뱀 길이와 게임 속도의 관계를 정의하세요"
-/>
-
-### 요청 예시
-
-<Source
-  language="text"
-  code={`
-> 뱀 길이에 따라 게임 속도가 증가하는 난이도 시스템을 만들어줘.
->
-> - 길이 1-5: 기본 속도
-> - 길이 6-10: 1.2배
-> - 길이 11+: 1.5배
-`}
-/>
-
----
-
-<ExerciseCard
   number={4}
-  title="장애물 추가"
+  title="벽 통과 모드"
   difficulty="중급"
-  description="맵에 고정 장애물을 배치하여 난이도를 높입니다."
-  hint="Obstacle 구조체와 충돌 감지를 추가하세요"
+  description="벽에 부딪히면 반대편으로 나오는 모드를 추가합니다."
+  hint="game.c에 wrap_around_mode 옵션을 추가해서, 활성화되면 벽을 통과할 수 있게 해줘"
 />
+
+### 요구사항
+- 토글 가능한 옵션
+- 왼쪽 벽 → 오른쪽으로 나옴
+- 위쪽 벽 → 아래쪽으로 나옴
+
+### 고려사항
+- 기존 벽 충돌 로직과의 분리
+- 게임 설정에 모드 추가
 
 ---
 
 <ExerciseCard
   number={5}
-  title="사운드 효과"
+  title="장애물 추가"
   difficulty="중급"
-  description="음식 섭취, 게임 오버 시 사운드를 재생합니다."
-  hint="raylib의 Sound 관련 함수를 사용하세요"
+  description="맵에 랜덤 장애물을 배치합니다."
+  hint="새로운 obstacle.c 모듈을 만들고, 장애물 생성 및 충돌 감지를 구현해줘"
 />
+
+### 요구사항
+- 게임 시작 시 3-5개의 장애물 생성
+- 장애물과 충돌 시 게임 오버
+- 음식은 장애물 위에 생성되지 않음
+
+### 예상 새 파일
+- `include/obstacle.h`
+- `src/obstacle.c`
+
+---
+
+<ExerciseCard
+  number={6}
+  title="일시정지 기능"
+  difficulty="중급"
+  description="게임 일시정지/재개 기능을 구현합니다."
+  hint="GameState enum에 GAME_STATE_PAUSED를 추가하고, P키로 토글하는 기능을 구현해줘"
+/>
+
+### 요구사항
+- P 키로 일시정지/재개 토글
+- 일시정지 시 "PAUSED" 표시
+- 일시정지 중 방향키 무시
+
+---
+
+<ExerciseCard
+  number={7}
+  title="유닛 테스트 작성"
+  difficulty="중급"
+  description="핵심 함수들에 대한 유닛 테스트를 작성합니다."
+  hint="exercises/basics/test_example.c를 참고해서 src/snake.c의 모든 함수에 대한 테스트를 작성해줘"
+/>
+
+### 요구사항
+- snake_init, snake_move, snake_grow 테스트
+- 경계 조건 테스트 포함
+- 에러 케이스 테스트 포함
 
 ---
 
 ## 고급 도전
 
 <ExerciseCard
-  number={6}
-  title="2인용 모드"
-  difficulty="고급"
-  description="두 명이 동시에 플레이할 수 있는 모드를 구현합니다."
-  hint="Snake 배열과 키 매핑을 분리하세요"
-/>
-
-### 요청 예시
-
-<Source
-  language="text"
-  code={`
-> 2인용 모드를 추가해줘.
->
-> 플레이어 1: 방향키 (위/아래/좌/우)
-> 플레이어 2: WASD 키
->
-> 각자 음식을 먹으면 점수 증가,
-> 서로 충돌하면 게임 오버.
-`}
-/>
-
----
-
-<ExerciseCard
-  number={7}
-  title="리플레이 시스템"
-  difficulty="고급"
-  description="게임 플레이를 저장하고 다시 재생할 수 있는 기능입니다."
-  hint="각 프레임의 입력을 기록하고 재생하세요"
-/>
-
----
-
-<ExerciseCard
   number={8}
-  title="AI 뱀"
+  title="저장/불러오기 기능"
   difficulty="고급"
-  description="음식을 향해 자동으로 이동하는 AI 뱀을 구현합니다."
-  hint="A* 또는 간단한 경로 찾기 알고리즘을 사용하세요"
+  description="게임 상태를 파일로 저장하고 불러오는 기능을 구현합니다."
+  hint="save_load.c 모듈을 만들어서 게임 상태를 save.dat 파일로 저장하고 불러오는 기능을 구현해줘"
 />
+
+### 요구사항
+- S 키로 현재 상태 저장
+- L 키로 저장된 상태 불러오기
+- 저장 파일 형식: 바이너리 또는 JSON
+
+### 고려사항
+- 뱀의 전체 몸통 위치 저장
+- 음식 위치, 점수, 방향 저장
+- 에러 처리 (파일 없음, 읽기 실패 등)
+
+---
+
+<ExerciseCard
+  number={9}
+  title="AI 자동 플레이"
+  difficulty="고급"
+  description="AI가 자동으로 게임을 플레이하는 모드를 추가합니다."
+  hint="ai_player.c 모듈을 만들어서 간단한 AI가 음식을 먹으러 가도록 구현해줘. BFS나 간단한 휴리스틱을 사용해도 좋아"
+/>
+
+### 요구사항
+- A 키로 AI 모드 토글
+- 기본 전략: 음식을 향해 이동
+- 벽과 자기 자신 충돌 회피
+
+### 알고리즘 옵션
+1. Greedy: 가장 가까운 방향으로
+2. BFS: 최단 경로 탐색
+3. A*: 휴리스틱 최적화
+
+---
+
+<ExerciseCard
+  number={10}
+  title="멀티플레이어"
+  difficulty="고급"
+  description="2인용 대전 모드를 구현합니다."
+  hint="2인용 게임을 위해 Snake 배열을 관리하고, 각 플레이어별 입력을 처리하도록 수정해줘"
+/>
+
+### 요구사항
+- Player 1: WASD 키
+- Player 2: 방향키
+- 각 플레이어별 점수 표시
+- 다른 플레이어와 충돌 시 게임 오버
+
+### 아키텍처 변경
+- `Game` 구조체에 `Snake players[2]` 추가
+- 입력 처리 분리
+- 렌더링 시 두 뱀 모두 표시
+
+---
+
+<ExerciseCard
+  number={11}
+  title="성능 최적화"
+  difficulty="고급"
+  description="코드 성능을 분석하고 최적화합니다."
+  hint="이 프로젝트의 성능 병목 지점을 분석하고 최적화 방안을 제안해줘"
+/>
+
+### 요구사항
+- 프로파일링으로 병목 지점 찾기
+- 메모리 사용량 최적화
+- 프레임 속도 개선
+
+---
+
+<ExerciseCard
+  number={12}
+  title="전체 리팩토링"
+  difficulty="고급"
+  description="프로젝트 전체를 리뷰하고 개선합니다."
+  hint="프로젝트 전체를 분석해서 개선이 필요한 부분을 우선순위별로 정리하고, 순차적으로 리팩토링해줘"
+/>
+
+### 요구사항
+- 코드 품질 분석
+- 아키텍처 개선 제안
+- 문서화 완성
+
+---
+
+## 완료 체크리스트
+
+### 초급 (Challenge 1-3)
+- [ ] Challenge 1: 점수 시스템 추가
+- [ ] Challenge 2: 게임 속도 조절
+- [ ] Challenge 3: 색상 변경
+
+### 중급 (Challenge 4-7)
+- [ ] Challenge 4: 벽 통과 모드
+- [ ] Challenge 5: 장애물 추가
+- [ ] Challenge 6: 일시정지 기능
+- [ ] Challenge 7: 유닛 테스트 작성
+
+### 고급 (Challenge 8-12)
+- [ ] Challenge 8: 저장/불러오기 기능
+- [ ] Challenge 9: AI 자동 플레이
+- [ ] Challenge 10: 멀티플레이어
+- [ ] Challenge 11: 성능 최적화
+- [ ] Challenge 12: 전체 리팩토링
 
 ---
 
@@ -150,6 +252,8 @@ import { ExerciseCard } from '../../components/ExerciseCard';
 2. **테스트 작성**: 기능 구현 전에 테스트 케이스를 먼저 작성하세요
 3. **Agent 활용**: 막힐 때 Agent에게 힌트를 요청하세요
 
+### 프롬프트 예시
+
 <Source
   language="text"
   code={`
@@ -157,3 +261,12 @@ import { ExerciseCard } from '../../components/ExerciseCard';
 > 단계별로 알려줘.
 `}
 />
+
+---
+
+## 참고 파일
+
+- **초급 실습**: `exercises/basics/buggy_snake.c` - 버그 수정 연습
+- **테스트 예제**: `exercises/basics/test_example.c` - 테스트 코드 작성 참고
+- **리팩토링 예제**: `exercises/basics/refactor_before.c` - 코드 개선 연습
+- **실제 구현 예제**: `exercises/solutions/` - 모범 답안 (막힐 때만 참고)
