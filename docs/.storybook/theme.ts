@@ -5,7 +5,7 @@ export default create({
 
   // 브랜딩
   brandTitle: 'AI Agent 교육',
-  brandUrl: 'https://github.com/anthropics/claude-code',
+  brandUrl: 'https://jhl-labs.github.io/snake-game/',
   brandTarget: '_self',
 
   // 색상
