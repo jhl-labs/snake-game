@@ -2,7 +2,7 @@
 
 from openai import OpenAI
 
-MODEL = "qwen3-vl:235b-cloud"
+MODEL = "qwen3-vl:235b-instruct-cloud"
 BASE_URL = "http://localhost:11434/v1"
 API_KEY = "ollama"  # Ollama는 API 키가 필요 없지만 SDK 요구사항
 
