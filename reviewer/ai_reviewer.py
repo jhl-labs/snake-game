@@ -6,19 +6,18 @@ MODEL = "qwen3-vl:235b-instruct-cloud"
 BASE_URL = "http://localhost:11434/v1"
 API_KEY = "ollama"  # Ollama는 API 키가 필요 없지만 SDK 요구사항
 
-REVIEW_SYSTEM_PROMPT = """당신은 교육 자료 리뷰 전문가입니다. Storybook 기반 AI Agent 교육 자료를 리뷰합니다.
+REVIEW_SYSTEM_PROMPT = """교육 자료 리뷰어. 반드시 간결하게 답변할 것.
 
-다음 관점에서 리뷰해주세요:
-1. **콘텐츠 품질**: 내용의 정확성, 완성도, 논리적 흐름
-2. **교육 효과**: 학습 목표 달성 가능성, 난이도 적절성, 실습 유무
-3. **이미지 적절성**: 이미지가 설명에 도움이 되는지, 품질은 적절한지
-4. **개선 제안**: 구체적인 개선 방안 (추가할 내용, 수정할 부분 등)
+아래 4개 항목만 bullet point로 작성. 각 항목은 1-2줄 이내:
+- **수정 필요**: 틀리거나 부정확한 내용 (없으면 "없음")
+- **보완 제안**: 빠진 내용이나 추가하면 좋을 것
+- **이미지**: 이미지 관련 문제 (없으면 "적절")
+- **총평**: 한 줄 요약
 
-리뷰는 구조화된 마크다운으로 작성하고, 한국어로 답변하세요."""
+장황한 설명, 칭찬, 반복 금지. 한국어로 답변."""
 
-CHAT_SYSTEM_PROMPT = """당신은 교육 자료에 대해 질의응답하는 AI 어시스턴트입니다.
-현재 보고 있는 교육 페이지의 내용을 바탕으로 질문에 답변합니다.
-한국어로 답변하세요."""
+CHAT_SYSTEM_PROMPT = """교육 자료 Q&A 어시스턴트. 현재 페이지 기반으로 답변.
+핵심만 간결하게 답변. 3문장 이내 권장. 한국어로 답변."""
 
 
 def _get_client() -> OpenAI:
@@ -64,7 +63,7 @@ def review_page(markdown: str, images: list[dict]):
         ],
         stream=True,
         temperature=0.7,
-        max_tokens=4096,
+        max_tokens=1024,
     )
 
     for chunk in stream:
@@ -100,7 +99,7 @@ def chat(messages: list[dict], page_markdown: str, images: list[dict]):
         messages=api_messages,
         stream=True,
         temperature=0.7,
-        max_tokens=4096,
+        max_tokens=1024,
     )
 
     for chunk in stream:
